@@ -1,11 +1,10 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException
 from typing import List
 import json
+import pprint
 
-app = FastAPI()
+router = APIRouter()
 
-# This is a temporary in-memory representation of our trace schema for validation.
-# In the future, this could be more robust, perhaps by fetching the schema definition.
 REQUIRED_SPAN_KEYS = {
     "trace_id",
     "span_id",
@@ -14,10 +13,10 @@ REQUIRED_SPAN_KEYS = {
     "end_time",
 }
 
-@app.post("/v1/traces")
+@router.post("/")
 async def receive_traces(request: Request):
     """
-    Receives a batch of spans, validates them, and prints them to the console.
+    Receives a batch of spans, validates them, and prints their full content.
     """
     try:
         spans = await request.json()
@@ -29,23 +28,18 @@ async def receive_traces(request: Request):
 
     print(f"--- Received batch of {len(spans)} spans ---")
     for i, span in enumerate(spans):
+        print(f"--- Span {i+1} ---")
         if not isinstance(span, dict):
-            print(f"  - Span {i+1} is not a valid object, skipping.")
+            print("  - Invalid span format: not a dictionary.")
             continue
 
         missing_keys = REQUIRED_SPAN_KEYS - set(span.keys())
         if missing_keys:
-            print(f"  - Span {i+1} is missing required keys: {missing_keys}, skipping.")
+            print(f"  - Invalid span: missing required keys: {missing_keys}")
             continue
+        
+        pprint.pprint(span)
 
-        print(f"  - Span {i+1}:")
-        print(f"    TraceID: {span.get('trace_id')}")
-        print(f"    SpanID:  {span.get('span_id')}")
-        print(f"    Name:    {span.get('name')}")
     print("--- End of batch ---")
 
     return {"status": "received", "count": len(spans)}
-
-@app.get("/")
-def read_root():
-    return {"message": "Aeonis Ingestion Server is running."}
