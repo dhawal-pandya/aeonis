@@ -1,4 +1,4 @@
-module github.com/aeonis/aeonis/packages/tracer-sdk/go
+module github.com/dhawal-pandya/aeonis/packages/tracer-sdk/go
 
 go 1.23.3
 
