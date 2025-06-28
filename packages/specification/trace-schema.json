@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Aeonis Span",
+  "description": "A single unit of work in an Aeonis trace.",
+  "type": "object",
+  "properties": {
+    "trace_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "span_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "parent_span_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string",
+      "description": "Name of the operation (e.g., function name, DB query)."
+    },
+    "start_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "end_time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "attributes": {
+      "type": "object",
+      "description": "Sanitized key-value pairs of metadata (inputs, outputs, etc.)."
+    },
+    "error": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "stack_trace": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "required": [
+    "trace_id",
+    "span_id",
+    "name",
+    "start_time",
+    "end_time"
+  ]
+}
