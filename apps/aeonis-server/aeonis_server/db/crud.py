@@ -29,3 +29,11 @@ class PostgresTraceRepository(TraceRepository):
         num_deleted = self.db.query(models.Span).filter(models.Span.project_id == project_id).delete()
         self.db.commit()
         return num_deleted
+
+    def get_spans_by_trace_id(self, trace_id: str) -> List[models.Span]:
+        return (
+            self.db.query(models.Span)
+            .filter(models.Span.trace_id == trace_id)
+            .order_by(models.Span.start_time.asc())
+            .all()
+        )

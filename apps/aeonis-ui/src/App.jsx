@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import TraceDetailView from './components/TraceDetailView';
 
 function App() {
-  const [projectId, setProjectId] = useState('');
+  const [projectId, setProjectId] = useState('784c74fe-4f62-493b-8a38-5a41409a4977'); // Default for convenience
   const [traces, setTraces] = useState([]);
+  const [selectedTrace, setSelectedTrace] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -14,16 +16,14 @@ function App() {
     setLoading(true);
     setError(null);
     setTraces([]);
+    setSelectedTrace(null);
 
     try {
-      // IMPORTANT: Replace with the actual URL of your Aeonis server
       const response = await fetch(`http://localhost:8000/v1/traces/projects/${projectId}/traces`);
-      
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
       }
-
       const data = await response.json();
       setTraces(data);
     } catch (e) {
@@ -33,11 +33,30 @@ function App() {
     }
   };
 
+  const fetchTraceDetails = async (traceId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`http://localhost:8000/v1/traces/${traceId}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setSelectedTrace(data);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-gray-900 text-white min-h-screen font-sans p-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <header className="mb-12 text-center">
           <h1 className="text-5xl font-bold text-indigo-400 mb-2">Aeonis</h1>
+          <p className="text-xl text-gray-400">Trace Visualizer</p>
         </header>
 
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
@@ -66,15 +85,31 @@ function App() {
           </div>
         )}
 
-        <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-          <h2 className="text-2xl font-semibold mb-4 border-b-2 border-gray-700 pb-2">Results</h2>
-          {traces.length > 0 ? (
-            <pre className="bg-gray-900 p-4 rounded-md overflow-x-auto">
-              {JSON.stringify(traces, null, 2)}
-            </pre>
-          ) : (
-            <p className="text-gray-500">No traces to display. Enter a Project ID and click "Fetch Traces".</p>
-          )}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="md:col-span-1 bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-semibold mb-4 border-b-2 border-gray-700 pb-2">Traces</h2>
+            <div className="space-y-2">
+              {traces.map((trace) => (
+                <div
+                  key={trace.trace_id}
+                  onClick={() => fetchTraceDetails(trace.trace_id)}
+                  className="p-3 bg-gray-700 rounded-md cursor-pointer hover:bg-indigo-500 transition"
+                >
+                  <p className="font-bold truncate">{trace.name}</p>
+                  <p className="text-sm text-gray-400">{new Date(trace.start_time).toLocaleString()}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="md:col-span-2 bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h2 className="text-2xl font-semibold mb-4 border-b-2 border-gray-700 pb-2">Selected Trace Details</h2>
+            {selectedTrace ? (
+              <TraceDetailView spans={selectedTrace} />
+            ) : (
+              <p className="text-gray-500">Select a trace from the list to see its details.</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

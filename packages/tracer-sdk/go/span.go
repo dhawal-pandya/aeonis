@@ -14,6 +14,7 @@ type Span struct {
 	Error        *SpanError             `json:"error,omitempty"`
 
 	// internal fields
+	tracer    *Tracer
 	exporter  Exporter
 	sanitizer Sanitizer
 }

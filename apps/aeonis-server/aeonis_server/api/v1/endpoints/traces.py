@@ -36,6 +36,10 @@ async def receive_traces(
     if not isinstance(spans, list):
         raise HTTPException(status_code=400, detail="Request body must be a JSON array of spans.")
 
+    # Log the received spans for debugging
+    import json
+    print(json.dumps(spans, indent=2))
+
     # Here you might add more robust validation against the trace-schema.json
     
     repo.add_spans(spans, project.id)
@@ -63,3 +67,16 @@ async def delete_project_traces(
     """
     num_deleted = repo.delete_traces_by_project_id(project_id)
     return {"status": "deleted", "deleted_count": num_deleted}
+
+@router.get("/{trace_id}")
+async def get_trace_by_id(
+    trace_id: str,
+    repo: TraceRepository = Depends(get_repository)
+):
+    """
+    Retrieves all spans for a given trace ID.
+    """
+    spans = repo.get_spans_by_trace_id(trace_id)
+    if not spans:
+        raise HTTPException(status_code=404, detail="Trace not found.")
+    return spans

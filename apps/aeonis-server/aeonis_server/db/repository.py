@@ -19,3 +19,7 @@ class TraceRepository(ABC):
     @abstractmethod
     def delete_traces_by_project_id(self, project_id: uuid.UUID) -> int:
         pass
+
+    @abstractmethod
+    def get_spans_by_trace_id(self, trace_id: str) -> List[Any]:
+        pass

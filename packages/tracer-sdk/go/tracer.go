@@ -33,25 +33,28 @@ func NewTracerWithExporter(serviceName string, exporter Exporter, sanitizer Sani
 
 // StartSpan starts a new span.
 func (t *Tracer) StartSpan(ctx context.Context, name string) (context.Context, *Span) {
-	parentSpanContext, _ := fromContext(ctx)
+	parentSpan, _ := fromContext(ctx)
 
 	span := &Span{
 		Name:       name,
 		StartTime:  time.Now().UTC(),
 		Attributes: make(map[string]interface{}),
+		tracer:     t, // Attach the tracer to the span
 		exporter:   t.exporter,
 		sanitizer:  t.sanitizer,
 	}
 
-	if parentSpanContext.traceID != "" {
-		span.TraceID = parentSpanContext.traceID
-		span.ParentSpanID = parentSpanContext.spanID
+	if parentSpan != nil {
+		span.TraceID = parentSpan.TraceID
+		span.ParentSpanID = parentSpan.SpanID
 	} else {
+		// This is a new root span
 		span.TraceID = uuid.New().String()
 	}
 
 	span.SpanID = uuid.New().String()
 
+	// Return a new context containing this new span
 	return toContext(ctx, span), span
 }
 
@@ -66,4 +69,36 @@ func (s *Span) End() {
 	if s.exporter != nil {
 		s.exporter.Export(s)
 	}
+}
+
+// SetError adds error information to the span.
+func (s *Span) SetError(message, stackTrace string) {
+	s.Error = &SpanError{
+		Message:    message,
+		StackTrace: stackTrace,
+	}
+}
+
+type tracerKey struct{}
+
+// ContextWithTracer returns a new context with the given tracer.
+func (t *Tracer) ContextWithTracer(ctx context.Context, tracer *Tracer) context.Context {
+	return context.WithValue(ctx, tracerKey{}, tracer)
+}
+
+// TracerFromContext returns the tracer from the given context.
+func TracerFromContext(ctx context.Context) (*Tracer, bool) {
+	t, ok := ctx.Value(tracerKey{}).(*Tracer)
+	return t, ok
+}
+
+// SpanFromContext returns the span from the given context.
+func SpanFromContext(ctx context.Context) (*Span, bool) {
+	s, ok := ctx.Value(spanKey{}).(*Span)
+	return s, ok
+}
+
+// Tracer returns the tracer that created the span.
+func (s *Span) Tracer() *Tracer {
+	return s.tracer
 }
