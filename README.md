@@ -32,11 +32,13 @@ This project is under active development. Here is the current status of the core
     *   Comprehensive unit tests have been written and are passing.
     *   Ready for deployment and integration into Go projects.
 
-*   **Ingestion Server (`apps/ingestion-server`):** 🚧 **Up Next**
-    *   This is the next major phase of development.
+*   **Ingestion Server (`apps/aeonis-server`):** ✅ **Active and In Development**
+    *   The server is built on FastAPI and connects to a PostgreSQL database.
+    *   It features a secure, multi-tenant ingestion endpoint (`/v1/traces`) that authenticates requests using project-specific API keys.
+    *   A repository pattern is in place to abstract database logic, making the system adaptable for future database technologies.
 
-*   **Web UI (`apps/web-ui`):** ⏳ **Planned**
-    *   Development will begin after the core server functionality is in place.
+*   **Web UI (`apps/aeonis-ui`):** 🚧 **Up Next**
+    *   Development of a basic trace visualization UI is the next priority.
 
 ## Monorepo Structure
 

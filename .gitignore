@@ -2,3 +2,6 @@
 
 
 __pycache__/
+# Ignore the test project
+invoxa-test/
+The Plan.md

@@ -1,45 +1,65 @@
-from fastapi import APIRouter, Request, HTTPException
-from typing import List
-import json
-import pprint
+from fastapi import APIRouter, Request, HTTPException, Depends, Header
+from typing import List, Dict, Any
+import uuid
+from sqlalchemy.orm import Session
+from aeonis_server.db.database import get_db
+from aeonis_server.db.crud import PostgresTraceRepository
+from aeonis_server.db.repository import TraceRepository
 
 router = APIRouter()
 
-REQUIRED_SPAN_KEYS = {
-    "trace_id",
-    "span_id",
-    "name",
-    "start_time",
-    "end_time",
-}
+def get_repository(db: Session = Depends(get_db)) -> TraceRepository:
+    return PostgresTraceRepository(db)
 
 @router.post("/")
-async def receive_traces(request: Request):
+async def receive_traces(
+    request: Request,
+    x_aeonis_api_key: str = Header(None),
+    repo: TraceRepository = Depends(get_repository)
+):
     """
-    Receives a batch of spans, validates them, and prints their full content.
+    Receives a batch of spans, validates them against an API key,
+    and persists them to the database.
     """
+    if not x_aeonis_api_key:
+        raise HTTPException(status_code=401, detail="X-Aeonis-API-Key header is required.")
+
+    project = repo.get_project_by_api_key(x_aeonis_api_key)
+    if not project:
+        raise HTTPException(status_code=401, detail="Invalid API Key.")
+
     try:
-        spans = await request.json()
-    except json.JSONDecodeError:
+        spans: List[Dict[str, Any]] = await request.json()
+    except Exception:
         raise HTTPException(status_code=400, detail="Invalid JSON body.")
 
     if not isinstance(spans, list):
         raise HTTPException(status_code=400, detail="Request body must be a JSON array of spans.")
 
-    print(f"--- Received batch of {len(spans)} spans ---")
-    for i, span in enumerate(spans):
-        print(f"--- Span {i+1} ---")
-        if not isinstance(span, dict):
-            print("  - Invalid span format: not a dictionary.")
-            continue
+    # Here you might add more robust validation against the trace-schema.json
+    
+    repo.add_spans(spans, project.id)
 
-        missing_keys = REQUIRED_SPAN_KEYS - set(span.keys())
-        if missing_keys:
-            print(f"  - Invalid span: missing required keys: {missing_keys}")
-            continue
-        
-        pprint.pprint(span)
+    return {"status": "received", "count": len(spans), "project_id": str(project.id)}
 
-    print("--- End of batch ---")
+@router.get("/projects/{project_id}/traces")
+async def get_project_traces(
+    project_id: uuid.UUID,
+    repo: TraceRepository = Depends(get_repository)
+):
+    """
+    Retrieves the most recent traces for a given project ID.
+    """
+    traces = repo.get_traces_by_project_id(project_id)
+    return traces
 
-    return {"status": "received", "count": len(spans)}
+@router.delete("/projects/{project_id}")
+async def delete_project_traces(
+    project_id: uuid.UUID,
+    repo: TraceRepository = Depends(get_repository)
+):
+    """
+    Deletes all traces for a given project ID.
+    """
+    num_deleted = repo.delete_traces_by_project_id(project_id)
+    return {"status": "deleted", "deleted_count": num_deleted}

@@ -13,8 +13,14 @@ type Tracer struct {
 	sanitizer   Sanitizer
 }
 
-// NewTracer creates a new tracer.
-func NewTracer(serviceName string, exporter Exporter, sanitizer Sanitizer) *Tracer {
+// NewTracer creates a new tracer with a default HTTP exporter.
+func NewTracer(serviceName, endpointURL, apiKey string, sanitizer Sanitizer) *Tracer {
+	exporter := NewHTTPExporter(endpointURL, apiKey)
+	return NewTracerWithExporter(serviceName, exporter, sanitizer)
+}
+
+// NewTracerWithExporter creates a new tracer with a custom exporter.
+func NewTracerWithExporter(serviceName string, exporter Exporter, sanitizer Sanitizer) *Tracer {
 	if sanitizer == nil {
 		sanitizer = &NoOpSanitizer{}
 	}

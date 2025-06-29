@@ -16,14 +16,16 @@ type Exporter interface {
 // HTTPExporter sends spans to an HTTP endpoint.
 type HTTPExporter struct {
 	endpointURL string
+	apiKey      string
 	client      *http.Client
 	spanChannel chan *Span
 }
 
 // NewHTTPExporter creates a new HTTP exporter.
-func NewHTTPExporter(endpointURL string) *HTTPExporter {
+func NewHTTPExporter(endpointURL string, apiKey string) *HTTPExporter {
 	exporter := &HTTPExporter{
 		endpointURL: endpointURL,
+		apiKey:      apiKey,
 		client:      &http.Client{Timeout: 5 * time.Second},
 		spanChannel: make(chan *Span, 1000),
 	}
@@ -73,6 +75,7 @@ func (e *HTTPExporter) sendBatch(batch []*Span) {
 		return
 	}
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Aeonis-API-Key", e.apiKey)
 
 	resp, err := e.client.Do(req)
 	if err != nil {
