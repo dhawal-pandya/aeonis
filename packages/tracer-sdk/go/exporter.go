@@ -5,12 +5,46 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
 // Exporter is the interface for exporting spans.
 type Exporter interface {
 	Export(span *Span)
+}
+
+// FileExporter writes spans to a file.
+type FileExporter struct {
+	file *os.File
+}
+
+// NewFileExporter creates a new file exporter.
+func NewFileExporter(filename string) *FileExporter {
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatalf("failed to open file: %v", err)
+	}
+	return &FileExporter{file: f}
+}
+
+// Export writes a span to the file.
+func (e *FileExporter) Export(span *Span) {
+	data, err := json.Marshal(span)
+	if err != nil {
+		log.Printf("failed to marshal span: %v", err)
+		return
+	}
+	if _, err := e.file.Write(append(data, '\n')); err != nil {
+		log.Printf("failed to write span to file: %v", err)
+	}
+}
+
+// Close closes the file.
+func (e *FileExporter) Close() {
+	if err := e.file.Close(); err != nil {
+		log.Printf("failed to close file: %v", err)
+	}
 }
 
 // HTTPExporter sends spans to an HTTP endpoint.

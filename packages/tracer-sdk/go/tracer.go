@@ -3,6 +3,8 @@ package tracer
 import (
 	"context"
 	"github.com/google/uuid"
+	"reflect"
+	"runtime"
 	"time"
 )
 
@@ -98,7 +100,54 @@ func SpanFromContext(ctx context.Context) (*Span, bool) {
 	return s, ok
 }
 
+// ContextWithSpan returns a new context with the given span.
+func ContextWithSpan(ctx context.Context, span *Span) context.Context {
+	return context.WithValue(ctx, spanKey{}, span)
+}
+
 // Tracer returns the tracer that created the span.
 func (s *Span) Tracer() *Tracer {
 	return s.tracer
+}
+
+// TraceFunc is a helper function that wraps a function call in a span.
+func (t *Tracer) TraceFunc(ctx context.Context, fn interface{}, params ...interface{}) []interface{} {
+	// Get function name and file/line number
+	funcName := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
+	_, file, line, _ := runtime.Caller(1)
+
+	// Start a new span
+	ctx, span := t.StartSpan(ctx, funcName)
+	defer span.End()
+
+	// Set attributes
+	span.SetAttributes(map[string]interface{}{
+		"code.function": funcName,
+		"code.filepath": file,
+		"code.lineno":   line,
+	})
+
+	// Call the function
+	v := reflect.ValueOf(fn)
+	in := make([]reflect.Value, len(params))
+	for i, param := range params {
+		in[i] = reflect.ValueOf(param)
+	}
+	out := v.Call(in)
+
+	// Set return values as attributes
+	returnValues := make([]interface{}, len(out))
+	for i, val := range out {
+		// Check if the value is an error and not nil
+		if err, ok := val.Interface().(error); ok && err != nil {
+			span.SetError(err.Error(), "") // Assuming no stack trace for now
+		}
+		returnValues[i] = val.Interface()
+	}
+	span.SetAttributes(map[string]interface{}{
+		"function.args":   params,
+		"function.return": returnValues,
+	})
+
+	return returnValues
 }

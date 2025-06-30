@@ -2,7 +2,9 @@
 .venv
 
 
+# Ignore python cache
 __pycache__/
 # Ignore the test project
 invoxa-test/
-The Plan.md
+invoxa-test/traces.json
+PLAN.md

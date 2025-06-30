@@ -2,6 +2,8 @@ package tracer
 
 import "time"
 
+type spanKey struct{}
+
 // Span represents a single unit of work in a trace.
 type Span struct {
 	TraceID      string                 `json:"trace_id"`

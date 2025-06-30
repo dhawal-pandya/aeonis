@@ -2,9 +2,6 @@ package tracer
 
 import "context"
 
-// spanKey is an unexported type to be used as the key for the context value.
-type spanKey struct{}
-
 // toContext embeds a span into a new context.
 func toContext(ctx context.Context, span *Span) context.Context {
 	return context.WithValue(ctx, spanKey{}, span)

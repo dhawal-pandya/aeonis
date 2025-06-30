@@ -23,7 +23,7 @@ func (m *MockExporter) Reset() {
 func TestTracer(t *testing.T) {
 	mockExporter := &MockExporter{}
 	sanitizer := &NoOpSanitizer{}
-	tracer := NewTracer("test-service", mockExporter, sanitizer)
+	tracer := NewTracerWithExporter("test-service", mockExporter, sanitizer)
 
 	t.Run("Creates a root span correctly", func(t *testing.T) {
 		mockExporter.Reset()
@@ -84,7 +84,7 @@ func TestTracer(t *testing.T) {
 	t.Run("SetAttributes uses the sanitizer", func(t *testing.T) {
 		mockExporter.Reset()
 		piiSanitizer := NewPIISanitizer()
-		piiTracer := NewTracer("pii-test-service", mockExporter, piiSanitizer)
+		piiTracer := NewTracerWithExporter("pii-test-service", mockExporter, piiSanitizer)
 
 		_, span := piiTracer.StartSpan(context.Background(), "pii-op")
 		span.SetAttributes(map[string]interface{}{
