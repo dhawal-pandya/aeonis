@@ -1,0 +1,67 @@
+# This file configures the standalone Toolbox server.
+sources:
+  aeonis-db-source:
+    kind: postgres
+    host: 127.0.0.1
+    port: 5432
+    user: aeonis_user
+    password: aeonis_password
+    database: aeonisdb
+
+
+
+
+tools:
+  get-all-projects:
+    kind: postgresql
+    source: aeonis-db-source
+    description: Retrieves a list of all projects.
+    statement: SELECT id, name FROM projects ORDER BY name;
+
+  get-project-by-name:
+    kind: postgresql
+    source: aeonis-db-source
+    description: Fetches project details by its name. Use this when the user specifies a project's name.
+    parameters:
+      - name: project_name
+        type: string
+        description: The name of the project.
+    statement: SELECT id, name FROM projects WHERE name ILIKE '%' || $1 || '%';
+
+  get-spans-by-project-id:
+    kind: postgresql
+    source: aeonis-db-source
+    description: Retrieves all spans for a given project ID.
+    parameters:
+      - name: project_id
+        type: string # UUID is a string
+        description: The UUID of the project.
+    statement: SELECT trace_id, span_id, name, start_time, end_time FROM spans WHERE project_id = $1 ORDER BY start_time DESC;
+
+  get-span-by-id:
+    kind: postgresql
+    source: aeonis-db-source
+    description: Fetches a span's details by its unique span_id.
+    parameters:
+      - name: span_id
+        type: string
+        description: The unique ID of the span.
+    statement: SELECT * FROM spans WHERE span_id = $1;
+
+  get-spans-by-trace-id:
+    kind: postgresql
+    source: aeonis-db-source
+    description: Retrieves all spans within a specific trace by its trace_id.
+    parameters:
+      - name: trace_id
+        type: string
+        description: The ID of the trace.
+    statement: SELECT span_id, parent_span_id, name, start_time, end_time FROM spans WHERE trace_id = $1 ORDER BY start_time;
+
+toolsets:
+  aeonis_toolset:
+    - get-all-projects
+    - get-project-by-name
+    - get-spans-by-project-id
+    - get-span-by-id
+    - get-spans-by-trace-id

@@ -1,0 +1,9 @@
+INFO:     2025-06-30 23:45:48,385 - Started server process [44430]
+INFO:     2025-06-30 23:45:48,385 - Started server process [44430]
+INFO:     2025-06-30 23:45:48,385 - Waiting for application startup.
+INFO:     2025-06-30 23:45:48,385 - Waiting for application startup.
+INFO:     2025-06-30 23:45:48,455 - Application startup complete.
+INFO:     2025-06-30 23:45:48,455 - Application startup complete.
+INFO:     2025-06-30 23:45:48,458 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-06-30 23:45:48,458 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-06-30 23:45:53,535 - 127.0.0.1:58070 - "GET /ping HTTP/1.1" 200
