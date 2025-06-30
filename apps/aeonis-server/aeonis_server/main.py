@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .api.v1.router import api_router
+from .api.router import router as api_router
 from .db.database import init_db
 
 app = FastAPI(
@@ -31,3 +31,7 @@ app.include_router(api_router, prefix="/v1")
 @app.get("/")
 def read_root():
     return {"message": "Aeonis Ingestion Server is running."}
+
+@app.get("/ping")
+def ping():
+    return {"message": "pong"}

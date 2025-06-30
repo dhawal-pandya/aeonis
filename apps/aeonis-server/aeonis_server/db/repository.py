@@ -23,3 +23,7 @@ class TraceRepository(ABC):
     @abstractmethod
     def get_spans_by_trace_id(self, trace_id: str) -> List[Any]:
         pass
+
+    @abstractmethod
+    def get_all_projects(self) -> List[Any]:
+        pass

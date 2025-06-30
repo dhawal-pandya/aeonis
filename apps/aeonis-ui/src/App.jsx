@@ -2,7 +2,7 @@ import { useState } from 'react';
 import TraceDetailView from './components/TraceDetailView';
 
 function App() {
-  const [projectId, setProjectId] = useState('784c74fe-4f62-493b-8a38-5a41409a4977'); // Default for convenience
+  const [projectId, setProjectId] = useState('9df1c007-08e0-45fb-ad99-2471f672a4bc'); // Default for convenience
   const [traces, setTraces] = useState([]);
   const [selectedTrace, setSelectedTrace] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -19,13 +19,24 @@ function App() {
     setSelectedTrace(null);
 
     try {
-      const response = await fetch(`http://localhost:8000/v1/traces/projects/${projectId}/traces`);
+      const response = await fetch(`http://localhost:8000/v1/projects/${projectId}/traces`);
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setTraces(data);
+      const tracesById = data.reduce((acc, span) => {
+        if (!acc[span.trace_id]) {
+          acc[span.trace_id] = [];
+        }
+        acc[span.trace_id].push(span);
+        return acc;
+      }, {});
+      const traceList = Object.values(tracesById).map(spans => {
+        const rootSpan = spans.find(s => !s.parent_span_id);
+        return rootSpan || spans[0];
+      });
+      setTraces(traceList);
     } catch (e) {
       setError(e.message);
     } finally {
