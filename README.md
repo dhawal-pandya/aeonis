@@ -9,42 +9,103 @@ Our vision is to create a comprehensive DevSecOps tool that helps developers:
 
 ## Core Components
 
-The Aeonis ecosystem is being built as a monorepo and consists of three primary components:
+1.  **`aeonis-tracer`**: Language-specific SDKs that developers integrate into their applications to capture detailed operational data (spans).
+2.  **`aeonis-server`**: The central server that ingests, stores, and serves trace data, and will eventually host the AI-powered analysis engine.
+3.  **`aeonis-ui`**: A modern web frontend for visualizing and analyzing the collected traces.
 
-1.  **`aeonis-tracer`**: A suite of language-specific SDKs that developers integrate into their applications. These tracers are lightweight, performant, and capture detailed operational data (spans) according to the OpenTelemetry standard. The SDKs are designed to be "plug and play", automatically instrumenting popular frameworks and libraries to provide deep visibility into the entire request lifecycle. The goal is to capture a "stack trace for success" by tracing the full execution path of a request, from the initial API call, through every function call, down to the database query.
+## Getting Started
 
-2.  **`aeonis-server`**: The central nervous system of the platform. This server (likely to be built in Python) is responsible for:
-    *   Ingesting trace data from the various SDKs.
-    *   Storing the data in a time-series database (e.g., PostgreSQL with TimescaleDB).
-    *   Providing an API for the web UI to query and display traces.
-    *   Hosting the MCP (Multi-Context Prompter) server, which uses AI and RAG to answer natural language questions about the trace data.
+This project is a monorepo containing the `aeonis-server` and `aeonis-ui`. The following instructions will guide you through setting up the development environment.
 
-3.  **`aeonis-ui`**: A modern, intuitive web frontend for visualizing and analyzing the collected traces. It will provide a rich interface for exploring service maps, trace flows, and interacting with the AI chat component.
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+- Go 1.20+
+- PostgreSQL
 
-## Current Project Status
+### 1. Setup the Aeonis Server
 
-This project is under active development. Here is the current status of the core components:
+The server is a FastAPI application responsible for ingesting and serving trace data.
 
-*   **Go Tracer SDK (`packages/tracer-sdk/go`):** ✅ **Active and In Development**
-    *   The Go SDK is currently being enhanced to provide automatic instrumentation for popular frameworks and libraries.
-    *   The goal is to capture a rich, hierarchical trace of the entire request lifecycle, including function calls, database queries, and more.
-    *   The SDK will provide a GORM plugin for automatic database tracing and enhanced Gin middleware for automatic request tracing.
-    *   A `TraceFunc` helper is being developed to enable detailed, debugger-like tracing of the entire function call stack for a given operation.
+```bash
+# Navigate to the server directory
+cd apps/aeonis-server
 
-*   **Ingestion Server (`apps/aeonis-server`):** ✅ **Active and In Development**
-    *   The server is built on FastAPI and connects to a PostgreSQL database.
-    *   It features a secure, multi-tenant ingestion endpoint (`/v1/traces`) that authenticates requests using project-specific API keys.
-    *   A repository pattern is in place to abstract database logic, making the system adaptable for future database technologies.
+# Create and activate a Python virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
 
-*   **Web UI (`apps/aeonis-ui`):** 🚧 **Up Next**
-    *   Development of a basic trace visualization UI is the next priority.
+# Install dependencies
+pip install -r requirements.txt
 
-## Monorepo Structure
+# Set up the database (run this once)
+# This assumes you have PostgreSQL running and a database named 'aeonisdb'
+init_db() 
 
-This project uses a monorepo structure to simplify dependency management and ensure consistency across components.
+# Run the server
+uvicorn aeonis_server.main:app --host 0.0.0.0 --port 8000 --reload
+```
 
-*   `apps/`: Contains deployable applications (the server, the UI).
-*   `packages/`: Contains shared libraries, specifications, and the tracer SDKs.
+The server will be running at `http://localhost:8000`.
+
+### 2. Setup the Aeonis UI
+
+The UI is a React application for visualizing traces.
+
+```bash
+# Navigate to the UI directory
+cd apps/aeonis-ui
+
+# Install dependencies
+npm install
+
+# Run the development server
+npm run dev
+```
+
+The UI will be available at `http://localhost:5173`.
+
+## Server API Endpoints
+
+The `aeonis-server` exposes the following RESTful API for managing projects and traces.
+
+### Projects API
+
+- **`GET /v1/projects`**
+  - **Description:** Retrieves a list of all projects.
+  - **Success Response:** `200 OK` with a JSON array of project objects.
+
+- **`POST /v1/projects`**
+  - **Description:** Creates a new project.
+  - **Query Parameter:** `name` (string, required) - The name of the new project.
+  - **Success Response:** `200 OK` with the newly created project object, including its `id` and `api_key`.
+  - **Example:** `curl -X POST "http://localhost:8000/v1/projects?name=MyNewApp"`
+
+- **`DELETE /v1/projects/{project_id}`**
+  - **Description:** Deletes a project and all of its associated traces.
+  - **Success Response:** `200 OK` with a confirmation message.
+
+### Traces API
+
+- **`POST /v1/traces`**
+  - **Description:** Ingests a batch of spans for a project.
+  - **Header:** `X-Aeonis-API-Key` (string, required) - The API key for the project.
+  - **Body:** A JSON array of span objects.
+  - **Success Response:** `200 OK` with a status message.
+
+- **`GET /v1/projects/{project_id}/traces`**
+  - **Description:** Retrieves all traces for a specific project, ordered by most recent.
+  - **Success Response:** `200 OK` with a JSON array of span objects.
+
+- **`GET /v1/traces/{trace_id}`**
+  - **Description:** Retrieves all spans for a specific trace ID.
+  - **Success Response:** `200 OK` with a JSON array of span objects.
+
+### Debug API
+
+- **`POST /v1/debug/clear-database`**
+  - **Description:** [FOR DEVELOPMENT ONLY] Deletes all data from the database by dropping and recreating all tables.
+  - **Success Response:** `200 OK` with a confirmation message.
 
 ---
 *This README reflects the project status as of Monday, June 30, 2025.*
