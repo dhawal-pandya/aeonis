@@ -12,6 +12,12 @@ class Project(Base):
 
     spans = relationship("Span", back_populates="project")
 
+    def to_dict(self):
+        return {
+            "id": str(self.id),
+            "name": self.name,
+        }
+
 class Span(Base):
     __tablename__ = "spans"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -26,3 +32,17 @@ class Span(Base):
 
     project_id = Column(UUID(as_uuid=True), ForeignKey("projects.id"), nullable=False)
     project = relationship("Project", back_populates="spans")
+
+    def to_dict(self):
+        return {
+            "id": str(self.id),
+            "trace_id": self.trace_id,
+            "span_id": self.span_id,
+            "parent_span_id": self.parent_span_id,
+            "name": self.name,
+            "start_time": self.start_time.isoformat(),
+            "end_time": self.end_time.isoformat(),
+            "attributes": self.attributes,
+            "error": self.error,
+            "project_id": str(self.project_id),
+        }

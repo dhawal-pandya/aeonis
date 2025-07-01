@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 from ..db.database import get_db
 from ..db.crud import PostgresTraceRepository
 from ..db.repository import TraceRepository
-
-# from ..mcp.agent import mcp_agent
+from ..mcp import llm_service, db_tools
+from ..mcp.functions import DB_TOOLS
 
 router = APIRouter()
 
@@ -14,21 +14,39 @@ router = APIRouter()
 def get_repository(db: Session = Depends(get_db)) -> TraceRepository:
     return PostgresTraceRepository(db)
 
+# --- AI Chat API ---
 
-# # --- AI Chat API ---
+@router.post("/projects/{project_id}/chat", tags=["AI Chat"])
+async def project_chat(
+    project_id: uuid.UUID,
+    request: Request,
+    repo: TraceRepository = Depends(get_repository),
+):
+    """Handles a chat message for a specific project."""
+    body = await request.json()
+    user_query = body.get("message")
+    if not user_query:
+        raise HTTPException(status_code=400, detail="Message is required.")
 
+    # 1. Generate the tool call from the LLM
+    tool_call = llm_service.generate_tool_call(user_query, tools=[DB_TOOLS])
 
-# @router.post("/chat", tags=["AI Chat"])
-# async def chat_with_agent(message: str):
-#     """Receives a user message and returns the agent's response."""
-#     try:
-#         response = mcp_agent.chat(message)
-#         return {"response": response}
-#     except Exception as e:
-#         import logging
+    # 2. Execute the appropriate tool
+    tool_name = tool_call.get("name")
+    tool_args = tool_call.get("args")
+    tool_output = ""
 
-#         logging.exception("Error during chat interaction")
-#         raise HTTPException(status_code=500, detail=f"Internal Server Error: {e}")
+    if tool_name == "get_traces_by_project_id":
+        # The project_id from the path is used directly
+        tool_output = db_tools.get_traces_by_project_id(repo, project_id)
+    elif tool_name == "get_spans_by_trace_id":
+        tool_output = db_tools.get_spans_by_trace_id(repo, **tool_args)
+    else:
+        raise HTTPException(status_code=500, detail=f"Unknown tool: {tool_name}")
+
+    # 3. Generate the final response
+    final_response = llm_service.generate_response(user_query, tool_output)
+    return {"response": final_response}
 
 
 # --- Core Project API ---
@@ -115,7 +133,7 @@ async def get_trace_by_id(
 @router.post("/debug/clear-database", tags=["Debug"])
 async def clear_database(repo: TraceRepository = Depends(get_repository)):
     """
-    [FOR DEVELOPMENT ONLY] Deletes all data from the database by dropping
+    [FOR DEVELOPMENT ONLY] Deletes all data from the database by by dropping
     and recreating all tables.
     """
     repo.delete_all_data()

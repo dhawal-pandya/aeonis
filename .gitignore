@@ -4,7 +4,8 @@
 
 # Ignore python cache
 __pycache__/
+
 # Ignore the test project
-invoxa-test/
-invoxa-test/traces.json
+invoxa-test
 PLAN.md
+gemini.md
