@@ -1,44 +1,98 @@
 # Aeonis Server
 
-This document provides quick instructions on how to run and test the Aeonis server.
+The Aeonis Server is the central backend for the Aeonis observability platform. It's a FastAPI application responsible for ingesting trace data, managing projects, and providing an AI-powered chat interface for data analysis.
 
-## How to Run
+## Getting Started
 
-1.  **Prerequisites**:
-    Ensure you have a `GEMINI_API_KEY` set as an environment variable. This is required for the AI Chat functionality.
+These instructions will guide you through setting up and running the server on your local machine for development and testing purposes.
 
-2.  **Install Dependencies**:
-    Navigate to the `apps/aeonis-server/` directory and install the required Python packages:
-    ```bash
-    python3 -m pip install -r requirements.txt
+### 1. Prerequisites
+
+-   **Python 3.10+**
+-   **PostgreSQL:** The server uses a PostgreSQL database. Make sure you have it installed and running.
+-   **Google Gemini API Key:** The AI chat functionality is powered by Google Gemini. You will need an API key.
+
+### 2. Database Setup
+
+The server requires a PostgreSQL database named `aeonisdb`.
+
+1.  **Start the PostgreSQL service.**
+
+2.  **Create the database:**
+    Open `psql` and run the following command to create the database.
+
+    ```sql
+    CREATE DATABASE aeonisdb;
     ```
 
-3.  **Start the Server**:
-    From the `apps/aeonis-server/` directory, run the server using Uvicorn:
-    ```bash
-    python3 -m uvicorn aeonis_server.main:app --host 0.0.0.0 --port 8000 --log-config uvicorn_log_config.json &
+### 3. Environment Setup
+
+The server requires a `.env` file for configuration.
+
+1.  **Create the file:**
+    In the `apps/aeonis-server/` directory, create a file named `.env`.
+
+2.  **Add environment variables:**
+    Add the following key-value pairs to the `.env` file.
+
+    ```env
+    # Get your API key from Google AI Studio: https://aistudio.google.com/app/apikey
+    GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
+
+    # This is the default connection string. Change it if your PostgreSQL setup is different.
+    DATABASE_URL="postgresql://localhost/aeonisdb"
     ```
-    This will start the server in the background on `http://localhost:8000`.
 
-## How to Test (Ping API)
+    Replace `"YOUR_GEMINI_API_KEY"` with your actual key.
 
-Once the server is running, you can test the `/ping` API endpoint:
+### 4. Installation
+
+1.  **Navigate to the server directory:**
+    ```bash
+    cd apps/aeonis-server
+    ```
+
+2.  **Create a virtual environment:**
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate
+    ```
+
+3.  **Install dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+### 5. Initialize the Database Schema
+
+Run the initialization script to create the necessary tables in your database.
 
 ```bash
-curl http://localhost:8000/ping
+python3 init_db_script.py
 ```
 
-Expected output:
+You should see the output `Database initialized successfully.`
+
+### 6. Running the Server
+
+You can now start the server using Uvicorn.
+
+```bash
+uvicorn aeonis_server.main:app --host 127.0.0.1 --port 8000
 ```
+
+The server will be running at `http://127.0.0.1:8000`.
+
+## API Verification
+
+You can verify that the server is running correctly by sending a `GET` request to the `/ping` endpoint.
+
+```bash
+curl http://127.0.0.1:8000/ping
+```
+
+You should receive the following response:
+
+```json
 {"message":"pong"}
 ```
-
-## AI Chat API
-
-The `aeonis-server` now includes an AI-powered chat endpoint for project-specific queries.
-
-- **`POST /v1/projects/{project_id}/chat`**
-  - **Description:** Sends a user message to the AI agent for a specific project and receives a response.
-  - **Body:** `{"message": "Your question here"}`
-  - **Success Response:** `200 OK` with a JSON object containing the AI's response.
-  - **Example:** `curl -X POST -H "Content-Type: application/json" -d '{"message": "Show me the latest traces"}' http://localhost:8000/v1/projects/YOUR_PROJECT_ID/chat`

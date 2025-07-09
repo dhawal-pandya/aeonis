@@ -27,3 +27,20 @@ class TraceRepository(ABC):
     @abstractmethod
     def get_all_projects(self) -> List[Any]:
         pass
+
+
+    @abstractmethod
+    def create_project(self, name: str) -> Any:
+        pass
+
+    @abstractmethod
+    def delete_project(self, project_id: uuid.UUID) -> int:
+        pass
+
+    @abstractmethod
+    def delete_all_data(self) -> int:
+        pass
+
+    @abstractmethod
+    def execute_sql(self, query: str) -> List[Dict[str, Any]]:
+        pass

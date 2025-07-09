@@ -28,25 +28,15 @@ async def project_chat(
     if not user_query:
         raise HTTPException(status_code=400, detail="Message is required.")
 
-    # 1. Generate the tool call from the LLM
-    tool_call = llm_service.generate_tool_call(user_query, tools=[DB_TOOLS])
+    # The new llm_service handles the entire chat flow
+    response_text = llm_service.chat_with_db(
+        user_query=user_query,
+        project_id=str(project_id),
+        repo=repo,
+        tools=[DB_TOOLS],
+    )
 
-    # 2. Execute the appropriate tool
-    tool_name = tool_call.get("name")
-    tool_args = tool_call.get("args")
-    tool_output = ""
-
-    if tool_name == "get_traces_by_project_id":
-        # The project_id from the path is used directly
-        tool_output = db_tools.get_traces_by_project_id(repo, project_id)
-    elif tool_name == "get_spans_by_trace_id":
-        tool_output = db_tools.get_spans_by_trace_id(repo, **tool_args)
-    else:
-        raise HTTPException(status_code=500, detail=f"Unknown tool: {tool_name}")
-
-    # 3. Generate the final response
-    final_response = llm_service.generate_response(user_query, tool_output)
-    return {"response": final_response}
+    return {"response": response_text}
 
 
 # --- Core Project API ---

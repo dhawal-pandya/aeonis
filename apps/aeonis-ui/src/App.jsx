@@ -132,7 +132,7 @@ function App() {
 
           {/* Right Column: AI Chatbox */}
           <div>
-            <Chatbox />
+            <Chatbox projectId={projectId} />
           </div>
         </div>
       </div>

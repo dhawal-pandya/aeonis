@@ -1,13 +1,16 @@
 import { useState } from 'react';
 
-const Chatbox = () => {
+const Chatbox = ({ projectId }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !projectId) {
+      setError('Project ID is missing.');
+      return;
+    }
 
     const newMessages = [...messages, { sender: 'user', text: input }];
     setMessages(newMessages);
@@ -16,12 +19,12 @@ const Chatbox = () => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:8001/v1/chat', {
+      const response = await fetch(`http://localhost:8000/v1/projects/${projectId}/chat`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: new URLSearchParams({ message: input }),
+        body: JSON.stringify({ message: input }),
       });
 
       if (!response.ok) {
@@ -81,11 +84,11 @@ const Chatbox = () => {
           onKeyPress={(e) => e.key === 'Enter' && !loading && handleSend()}
           placeholder="Ask a question about your traces..."
           className="flex-grow bg-gray-700 text-white placeholder-gray-500 p-3 rounded-md border-2 border-gray-600 focus:border-indigo-500 focus:ring-indigo-500 transition"
-          disabled={loading}
+          disabled={loading || !projectId}
         />
         <button
           onClick={handleSend}
-          disabled={loading}
+          disabled={loading || !projectId}
           className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-900 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-md transition ml-4"
         >
           Send

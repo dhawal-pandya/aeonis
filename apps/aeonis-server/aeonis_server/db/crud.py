@@ -107,3 +107,9 @@ class PostgresTraceRepository(TraceRepository):
             print(f"Error clearing database: {e}")
             return -1
 
+    def execute_sql(self, query: str) -> List[Dict[str, Any]]:
+        """Executes a read-only SQL query and returns the results as a list of dicts."""
+        result = self.db.execute(text(query))
+        # The .mappings().all() method returns a list of dictionary-like objects
+        return [row for row in result.mappings().all()]
+

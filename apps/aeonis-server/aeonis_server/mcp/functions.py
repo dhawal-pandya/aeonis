@@ -25,10 +25,26 @@ GET_SPANS_BY_TRACE_ID = FunctionDeclaration(
     },
 )
 
+EXECUTE_SQL_QUERY = FunctionDeclaration(
+    name="execute_sql_query",
+    description="Executes a read-only SQL query (SELECT) against the database.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "query": {
+                "type": "string",
+                "description": "The SELECT SQL query to execute.",
+            },
+        },
+        "required": ["query"],
+    },
+)
+
 # Create a Tool object from the function declarations
 DB_TOOLS = Tool(
     function_declarations=[
         GET_TRACES_BY_PROJECT_ID,
         GET_SPANS_BY_TRACE_ID,
+        EXECUTE_SQL_QUERY,
     ]
 )

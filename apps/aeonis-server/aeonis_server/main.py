@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 from .api.router import router as api_router
 from .db.database import init_db
+
+load_dotenv()
 
 app = FastAPI(title="Aeonis Ingestion Server", version="0.1.0")
 

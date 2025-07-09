@@ -1,17 +1,22 @@
-# Aeonis: An AI-Powered DevSecOps Platform
+# Aeonis: An AI-Powered Observability Platform
 
 Aeonis is an observability platform designed to provide deep, AI-powered insights into your applications. It combines distributed tracing with a conversational AI interface, allowing developers to not only visualize application flow but also ask complex questions about their system's behavior, security, and performance.
 
-Our vision is to create a comprehensive DevSecOps tool that helps developers:
-- **Identify Security Risks**: Proactively detect potential data leaks by asking questions like, *"Is this change logging sensitive data to a webhook?"*
-- **Understand Code Impact**: Analyze the ripple effects of changes, asking *"Where would a new feature require the fewest changes?"*
-- **Optimize Performance**: Compare performance characteristics across different versions or feature flags, asking *"How did the last commit affect database query times?"*
+## Guiding Principles
 
-## Core Components
+-   **Developer Experience is Paramount**: Simple, idiomatic, and low-friction.
+-   **Specification-Driven and Modular**: Language-agnostic, decoupled, and scalable.
+-   **Performance is a Non-Negotiable Feature**: Asynchronous, efficient, and low-overhead.
+-   **Security and Privacy by Design**: Secure defaults, PII-aware, and data integrity.
+-   **Pragmatic, Not Dogmatic**: Practical, justified, and the right tool for the job.
 
-1.  **`aeonis-tracer`**: Language-specific SDKs that developers integrate into their applications to capture detailed operational data (spans).
-2.  **`aeonis-server`**: The central server that ingests, stores, and serves trace data, and will eventually host the AI-powered analysis engine.
-3.  **`aeonis-ui`**: A modern web frontend for visualizing and analyzing the collected traces.
+## High-Level Architecture
+
+The Aeonis platform consists of three main components:
+
+1.  **Tracer SDKs (`/packages/tracer-sdk`)**: Language-specific libraries that developers integrate into their applications. They capture operational data (spans) and export it to the Aeonis Server.
+2.  **Aeonis Server (`/apps/aeonis-server`)**: The central backend that ingests, stores, and serves trace data. It exposes a REST API for data collection and querying, and it integrates with Google Gemini to provide an AI-powered chat for analysis.
+3.  **Aeonis UI (`/apps/aeonis-ui`)**: A modern React-based web frontend for visualizing traces and interacting with the AI chat interface.
 
 ## Getting Started
 
@@ -23,63 +28,85 @@ This project is a monorepo containing the `aeonis-server` and `aeonis-ui`. The f
 - Go 1.20+
 - PostgreSQL
 
-### 1. Setup the Aeonis Server
+## Local Development Setup
 
-The server is a FastAPI application responsible for ingesting and serving trace data.
+This project is a monorepo containing the server and UI. The following instructions will guide you through setting up the full local development environment.
 
-```bash
-# Navigate to the server directory
-cd apps/aeonis-server
+### Step 1: Set up the Aeonis Server
 
-# Create and activate a Python virtual environment
-python3 -m venv .venv
-source .venv/bin/activate
+The server is the core of the platform. It must be running for the UI to function.
 
-# Install dependencies
-pip install -r requirements.txt
+**For detailed instructions, refer to the server's README:**
+[`/apps/aeonis-server/README.md`](./apps/aeonis-server/README.md)
 
-# Set up the database (run this once)
-# This assumes you have PostgreSQL running and a database named 'aeonisdb'
-init_db() 
+**Quick Setup:**
 
-# Run the server
-uvicorn aeonis_server.main:app --host 0.0.0.0 --port 8000 --reload
-```
+1.  **Setup PostgreSQL:** Create a database named `aeonisdb`.
+    ```sql
+    -- In psql
+    CREATE DATABASE aeonisdb;
+    ```
+2.  **Configure Environment:** Create an `.env` file in `/apps/aeonis-server/` with your `GEMINI_API_KEY` and `DATABASE_URL`.
+3.  **Install & Run:**
+    ```bash
+    # Navigate to the server directory
+    cd apps/aeonis-server
 
-The server will be running at `http://localhost:8000`.
+    # Create and activate a Python virtual environment
+    python3 -m venv .venv
+    source .venv/bin/activate
 
-### 2. Setup the Aeonis UI
+    # Install dependencies
+    pip install -r requirements.txt
 
-The UI is a React application for visualizing traces.
+    # Initialize the database schema (run once)
+    python3 init_db_script.py
 
-```bash
-# Navigate to the UI directory
-cd apps/aeonis-ui
+    # Run the server
+    uvicorn aeonis_server.main:app --host 127.0.0.1 --port 8000
+    ```
 
-# Install dependencies
-npm install
+### Step 2: Set up the Aeonis UI
 
-# Run the development server
-npm run dev
-```
+The UI is the web interface for interacting with the platform.
 
-The UI will be available at `http://localhost:5173`.
+**For detailed instructions, refer to the UI's README:**
+[`/apps/aeonis-ui/README.md`](./apps/aeonis-ui/README.md)
 
-## Server API Endpoints
+**Quick Setup:**
 
-The `aeonis-server` exposes the following RESTful API for managing projects and traces.
+1.  **Navigate to the UI directory:**
+    ```bash
+    cd apps/aeonis-ui
+    ```
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+3.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
+
+### Step 3: Use the Application
+
+-   The **Aeonis Server** will be running at `http://127.0.0.1:8000`.
+-   The **Aeonis UI** will be available at `http://localhost:5173`.
+
+Open the UI in your browser to start exploring. You will need a Project ID to fetch traces and use the chat. You can create a project and get an API key by calling the server's API.
 
 ### Projects API
+
+**Example: Create a Project**
+```bash
+curl -X POST "http://localhost:8000/v1/projects?name=MyTestProject"
+```
+This will return a new project with an `id` and `api_key`. Use the `id` in the UI.
 
 - **`GET /v1/projects`**
   - **Description:** Retrieves a list of all projects.
   - **Success Response:** `200 OK` with a JSON array of project objects.
 
-- **`POST /v1/projects`**
-  - **Description:** Creates a new project.
-  - **Query Parameter:** `name` (string, required) - The name of the new project.
-  - **Success Response:** `200 OK` with the newly created project object, including its `id` and `api_key`.
-  - **Example:** `curl -X POST "http://localhost:8000/v1/projects?name=MyNewApp"`
 
 - **`DELETE /v1/projects/{project_id}`**
   - **Description:** Deletes a project and all of its associated traces.
@@ -107,5 +134,6 @@ The `aeonis-server` exposes the following RESTful API for managing projects and 
   - **Description:** [FOR DEVELOPMENT ONLY] Deletes all data from the database by dropping and recreating all tables.
   - **Success Response:** `200 OK` with a confirmation message.
 
+
 ---
-*This README reflects the project status as of Monday, June 30, 2025.*
+*This README reflects the project status as of Wednesday, July 9, 2025.*
