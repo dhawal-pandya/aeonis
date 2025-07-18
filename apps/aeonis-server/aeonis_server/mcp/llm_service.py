@@ -4,7 +4,7 @@ import google.generativeai as genai
 from google.generativeai import protos
 from .prompts import SYSTEM_PROMPT
 from ..db.repository import TraceRepository
-from . import db_tools
+from . import db_tools, git_tools
 
 # Configure the Gemini API key
 API_KEY = os.getenv("GEMINI_API_KEY")
@@ -38,8 +38,9 @@ def chat_with_db(user_query: str, project_id: str, repo: TraceRepository, tools:
         tool_name = tool_call.name
         tool_args = dict(tool_call.args)
 
-        # tools
+        # --- Tool Dispatch ---
         tool_output_content = ""
+        # Database Tools
         if tool_name == "get_traces_by_project_id":
             tool_args["project_id"] = project_id
             tool_output_content = db_tools.get_traces_by_project_id(repo, **tool_args)
@@ -47,10 +48,19 @@ def chat_with_db(user_query: str, project_id: str, repo: TraceRepository, tools:
             tool_output_content = db_tools.get_spans_by_trace_id(repo, **tool_args)
         elif tool_name == "execute_sql_query":
             tool_output_content = db_tools.execute_sql_query(repo, **tool_args)
+        # Git Tools
+        elif tool_name == "list_branches":
+            tool_output_content = git_tools.list_branches()
+        elif tool_name == "get_commit_history":
+            tool_output_content = git_tools.get_commit_history(**tool_args)
+        elif tool_name == "get_commit_diff":
+            tool_output_content = git_tools.get_commit_diff(**tool_args)
+        elif tool_name == "read_file_at_commit":
+            tool_output_content = git_tools.read_file_at_commit(**tool_args)
         else:
             tool_output_content = json.dumps({"error": f"Unknown tool: {tool_name}"})
 
-        # output the tool response
+        # --- Respond to Model ---
         tool_output = protos.FunctionResponse(
             name=tool_name,
             response={"content": tool_output_content},
@@ -59,4 +69,5 @@ def chat_with_db(user_query: str, project_id: str, repo: TraceRepository, tools:
         final_response = chat.send_message(tool_output)
         return final_response.text
     else:
+        # If no tool call, return the direct text response
         return first_part.text

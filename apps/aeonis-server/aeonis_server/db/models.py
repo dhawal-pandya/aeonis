@@ -25,6 +25,8 @@ class Span(Base):
     span_id = Column(String, nullable=False, unique=True)
     parent_span_id = Column(String, nullable=True)
     name = Column(String, nullable=False)
+    commit_id = Column(String, nullable=True, index=True)
+    sdk_version = Column(String, nullable=True)
     start_time = Column(DateTime(timezone=True), nullable=False)
     end_time = Column(DateTime(timezone=True), nullable=False)
     attributes = Column(JSON, nullable=True)
@@ -40,6 +42,8 @@ class Span(Base):
             "span_id": self.span_id,
             "parent_span_id": self.parent_span_id,
             "name": self.name,
+            "commit_id": self.commit_id,
+            "sdk_version": self.sdk_version,
             "start_time": self.start_time.isoformat(),
             "end_time": self.end_time.isoformat(),
             "attributes": self.attributes,

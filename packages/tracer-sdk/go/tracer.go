@@ -2,6 +2,7 @@ package tracer
 
 import (
 	"context"
+	"os"
 	"reflect"
 	"runtime"
 	"time"
@@ -9,11 +10,14 @@ import (
 	"github.com/google/uuid"
 )
 
+const tracerVersion = "0.2.0"
+
 // Tracer is the entry point for creating spans.
 type Tracer struct {
-	serviceName string
-	exporter    Exporter
-	sanitizer   Sanitizer
+	serviceName       string
+	exporter          Exporter
+	sanitizer         Sanitizer
+	resourceAttributes map[string]interface{}
 }
 
 // NewTracer creates a new tracer with a default HTTP exporter.
@@ -27,10 +31,19 @@ func NewTracerWithExporter(serviceName string, exporter Exporter, sanitizer Sani
 	if sanitizer == nil {
 		sanitizer = &NoOpSanitizer{}
 	}
+
+	resourceAttributes := map[string]interface{}{
+		"telemetry.sdk.version": tracerVersion,
+	}
+	if commitID := os.Getenv("AEONIS_COMMIT_ID"); commitID != "" {
+		resourceAttributes["service.version"] = commitID
+	}
+
 	return &Tracer{
-		serviceName: serviceName,
-		exporter:    exporter,
-		sanitizer:   sanitizer,
+		serviceName:       serviceName,
+		exporter:          exporter,
+		sanitizer:         sanitizer,
+		resourceAttributes: resourceAttributes,
 	}
 }
 
@@ -42,9 +55,14 @@ func (t *Tracer) StartSpan(ctx context.Context, name string) (context.Context, *
 		Name:       name,
 		StartTime:  time.Now().UTC(),
 		Attributes: make(map[string]interface{}),
-		tracer:     t, 
+		tracer:     t,
 		exporter:   t.exporter,
 		sanitizer:  t.sanitizer,
+	}
+
+	// Add resource attributes to the span
+	for k, v := range t.resourceAttributes {
+		span.Attributes[k] = v
 	}
 
 	if parentSpan != nil {
@@ -61,7 +79,10 @@ func (t *Tracer) StartSpan(ctx context.Context, name string) (context.Context, *
 
 // SetAttributes sets the attributes for the span, applying sanitization.
 func (s *Span) SetAttributes(attributes map[string]interface{}) {
-	s.Attributes = s.sanitizer.Sanitize(attributes)
+	// Merge new attributes with existing (resource) attributes
+	for k, v := range s.sanitizer.Sanitize(attributes) {
+		s.Attributes[k] = v
+	}
 }
 
 // End completes the span, calculating the duration and exporting it.

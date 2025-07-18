@@ -8,7 +8,15 @@ Aeonis is an observability platform designed to provide deep, AI-powered insight
 -   **Specification-Driven and Modular**: Language-agnostic, decoupled, and scalable.
 -   **Performance is a Non-Negotiable Feature**: Asynchronous, efficient, and low-overhead.
 -   **Security and Privacy by Design**: Secure defaults, PII-aware, and data integrity.
--   **Pragmatic, Not Dogmatic**: Practical, justified, and the right tool for the job.
+- **Pragmatic, Not Dogmatic**: Practical, justified, and the right tool for the job.
+
+## Roadmap
+
+Aeonis is under active development. Our long-term vision is to provide a comprehensive, AI-first observability platform. Key features on our roadmap include:
+
+-   **Expanded Language Support**: Adding official tracer SDKs for Python, JavaScript/TypeScript, and other popular languages.
+-   **Advanced AI Analysis**: Integrating Git repository data and static analysis tools to allow the AI to answer deep questions about code changes, security vulnerabilities, and performance optimizations.
+-   **Enhanced UI Visualizations**: Building more sophisticated ways to visualize and explore complex trace data.
 
 ## High-Level Architecture
 
@@ -136,4 +144,4 @@ This will return a new project with an `id` and `api_key`. Use the `id` in the U
 
 
 ---
-*This README reflects the project status as of Wednesday, July 9, 2025.*
+*This README reflects the project status as of Friday, July 18, 2025.*

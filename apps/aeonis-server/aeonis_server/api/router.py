@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 from ..db.database import get_db
 from ..db.crud import PostgresTraceRepository
 from ..db.repository import TraceRepository
-from ..mcp import llm_service, db_tools
-from ..mcp.functions import DB_TOOLS
+from ..mcp import llm_service
+from ..mcp.functions import ALL_TOOLS
 
 router = APIRouter()
 
@@ -30,12 +30,12 @@ async def project_chat(
     if not user_query:
         raise HTTPException(status_code=400, detail="Message is required.")
 
-    # The new llm_service handles the entire chat flow
+    # The llm_service handles the entire chat flow, now with all available tools
     response_text = llm_service.chat_with_db(
         user_query=user_query,
         project_id=str(project_id),
         repo=repo,
-        tools=[DB_TOOLS],
+        tools=ALL_TOOLS,
     )
 
     return {"response": response_text}

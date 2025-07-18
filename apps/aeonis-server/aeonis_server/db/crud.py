@@ -15,7 +15,18 @@ class PostgresTraceRepository(TraceRepository):
         return self.db.query(models.Project).filter(models.Project.api_key == api_key).first()
 
     def add_spans(self, spans: List[Dict[str, Any]], project_id: uuid.UUID):
-        db_spans = [models.Span(**span, project_id=project_id) for span in spans]
+        db_spans = []
+        for span_data in spans:
+            attributes = span_data.get("attributes", {})
+            commit_id = attributes.pop("service.version", None)
+            sdk_version = attributes.pop("telemetry.sdk.version", None)
+            
+            span_data["attributes"] = attributes
+            span_data["commit_id"] = commit_id
+            span_data["sdk_version"] = sdk_version
+            
+            db_spans.append(models.Span(**span_data, project_id=project_id))
+            
         self.db.add_all(db_spans)
         self.db.commit()
 

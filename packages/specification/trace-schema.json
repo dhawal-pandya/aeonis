@@ -30,7 +30,27 @@
     },
     "attributes": {
       "type": "object",
-      "description": "Sanitized key-value pairs of metadata (inputs, outputs, etc.)."
+      "description": "Key-value pairs of metadata that describe the resource producing the span and the operation being performed. Allows for arbitrary custom attributes.",
+      "properties": {
+        "service.name": {
+          "type": "string",
+          "description": "The logical name of the service. (e.g., 'aeonis-server', 'billing-service')."
+        },
+        "service.version": {
+          "type": "string",
+          "description": "The version of the service, typically the Git commit hash."
+        },
+        "telemetry.sdk.name": {
+          "type": "string",
+          "default": "aeonis",
+          "description": "The name of the SDK."
+        },
+        "telemetry.sdk.version": {
+          "type": "string",
+          "description": "The version of the Aeonis SDK used for instrumentation."
+        }
+      },
+      "additionalProperties": true
     },
     "error": {
       "type": "object",
