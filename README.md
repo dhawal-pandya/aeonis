@@ -2,14 +2,6 @@
 
 Aeonis is an observability platform designed to provide deep, AI-powered insights into your applications. It combines distributed tracing with a conversational AI interface, allowing developers to not only visualize application flow but also ask complex questions about their system's behavior, security, and performance.
 
-## Guiding Principles
-
--   **Developer Experience is Paramount**: Simple, idiomatic, and low-friction.
--   **Specification-Driven and Modular**: Language-agnostic, decoupled, and scalable.
--   **Performance is a Non-Negotiable Feature**: Asynchronous, efficient, and low-overhead.
--   **Security and Privacy by Design**: Secure defaults, PII-aware, and data integrity.
-- **Pragmatic, Not Dogmatic**: Practical, justified, and the right tool for the job.
-
 ## Roadmap
 
 Aeonis is under active development. Our long-term vision is to provide a comprehensive, AI-first observability platform. Key features on our roadmap include:
@@ -102,46 +94,6 @@ The UI is the web interface for interacting with the platform.
 -   The **Aeonis UI** will be available at `http://localhost:5173`.
 
 Open the UI in your browser to start exploring. You will need a Project ID to fetch traces and use the chat. You can create a project and get an API key by calling the server's API.
-
-### Projects API
-
-**Example: Create a Project**
-```bash
-curl -X POST "http://localhost:8000/v1/projects?name=MyTestProject"
-```
-This will return a new project with an `id` and `api_key`. Use the `id` in the UI.
-
-- **`GET /v1/projects`**
-  - **Description:** Retrieves a list of all projects.
-  - **Success Response:** `200 OK` with a JSON array of project objects.
-
-
-- **`DELETE /v1/projects/{project_id}`**
-  - **Description:** Deletes a project and all of its associated traces.
-  - **Success Response:** `200 OK` with a confirmation message.
-
-### Traces API
-
-- **`POST /v1/traces`**
-  - **Description:** Ingests a batch of spans for a project.
-  - **Header:** `X-Aeonis-API-Key` (string, required) - The API key for the project.
-  - **Body:** A JSON array of span objects.
-  - **Success Response:** `200 OK` with a status message.
-
-- **`GET /v1/projects/{project_id}/traces`**
-  - **Description:** Retrieves all traces for a specific project, ordered by most recent.
-  - **Success Response:** `200 OK` with a JSON array of span objects.
-
-- **`GET /v1/traces/{trace_id}`**
-  - **Description:** Retrieves all spans for a specific trace ID.
-  - **Success Response:** `200 OK` with a JSON array of span objects.
-
-### Debug API
-
-- **`POST /v1/debug/clear-database`**
-  - **Description:** [FOR DEVELOPMENT ONLY] Deletes all data from the database by dropping and recreating all tables.
-  - **Success Response:** `200 OK` with a confirmation message.
-
 
 ---
 *This README reflects the project status as of Friday, July 18, 2025.*
