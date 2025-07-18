@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const tracerVersion = "0.2.0"
+const tracerVersion = "0.3.0"
 
 // Tracer is the entry point for creating spans.
 type Tracer struct {
@@ -32,11 +32,14 @@ func NewTracerWithExporter(serviceName string, exporter Exporter, sanitizer Sani
 		sanitizer = &NoOpSanitizer{}
 	}
 
+	commitID := os.Getenv("AEONIS_COMMIT_ID")
+	if commitID == "" {
+		commitID = "local"
+	}
+
 	resourceAttributes := map[string]interface{}{
 		"telemetry.sdk.version": tracerVersion,
-	}
-	if commitID := os.Getenv("AEONIS_COMMIT_ID"); commitID != "" {
-		resourceAttributes["service.version"] = commitID
+		"service.version":       commitID,
 	}
 
 	return &Tracer{
