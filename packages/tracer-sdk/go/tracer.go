@@ -2,10 +2,11 @@ package tracer
 
 import (
 	"context"
-	"github.com/google/uuid"
 	"reflect"
 	"runtime"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // Tracer is the entry point for creating spans.
@@ -41,7 +42,7 @@ func (t *Tracer) StartSpan(ctx context.Context, name string) (context.Context, *
 		Name:       name,
 		StartTime:  time.Now().UTC(),
 		Attributes: make(map[string]interface{}),
-		tracer:     t, // Attach the tracer to the span
+		tracer:     t, 
 		exporter:   t.exporter,
 		sanitizer:  t.sanitizer,
 	}
@@ -50,13 +51,11 @@ func (t *Tracer) StartSpan(ctx context.Context, name string) (context.Context, *
 		span.TraceID = parentSpan.TraceID
 		span.ParentSpanID = parentSpan.SpanID
 	} else {
-		// This is a new root span
 		span.TraceID = uuid.New().String()
 	}
 
 	span.SpanID = uuid.New().String()
 
-	// Return a new context containing this new span
 	return toContext(ctx, span), span
 }
 
@@ -112,22 +111,19 @@ func (s *Span) Tracer() *Tracer {
 
 // TraceFunc is a helper function that wraps a function call in a span.
 func (t *Tracer) TraceFunc(ctx context.Context, fn interface{}, params ...interface{}) []interface{} {
-	// Get function name and file/line number
+
 	funcName := runtime.FuncForPC(reflect.ValueOf(fn).Pointer()).Name()
 	_, file, line, _ := runtime.Caller(1)
 
-	// Start a new span
 	ctx, span := t.StartSpan(ctx, funcName)
 	defer span.End()
 
-	// Set attributes
 	span.SetAttributes(map[string]interface{}{
 		"code.function": funcName,
 		"code.filepath": file,
 		"code.lineno":   line,
 	})
 
-	// Call the function
 	v := reflect.ValueOf(fn)
 	in := make([]reflect.Value, len(params))
 	for i, param := range params {
@@ -135,12 +131,10 @@ func (t *Tracer) TraceFunc(ctx context.Context, fn interface{}, params ...interf
 	}
 	out := v.Call(in)
 
-	// Set return values as attributes
 	returnValues := make([]interface{}, len(out))
 	for i, val := range out {
-		// Check if the value is an error and not nil
 		if err, ok := val.Interface().(error); ok && err != nil {
-			span.SetError(err.Error(), "") // Assuming no stack trace for now
+			span.SetError(err.Error(), "") // assuming no stack trace for now
 		}
 		returnValues[i] = val.Interface()
 	}

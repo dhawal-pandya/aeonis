@@ -17,9 +17,6 @@ def chat_with_db(user_query: str, project_id: str, repo: TraceRepository, tools:
     """
     Handles the full chat interaction, including tool calls and natural language responses.
     """
-    # Initialize the generative model with tools.
-    # A new model is initialized for each request to include the project_id
-    # in the system instructions, ensuring the context is always current.
     system_instruction = f"{SYSTEM_PROMPT}\n\n**Current Project Context:** You are currently operating on `project_id`: `{project_id}`."
 
     model = genai.GenerativeModel(
@@ -30,7 +27,6 @@ def chat_with_db(user_query: str, project_id: str, repo: TraceRepository, tools:
 
     chat = model.start_chat()
 
-    # Send user query to the model
     response = chat.send_message(
         user_query, tool_config={"function_calling_config": "auto"}
     )
@@ -42,11 +38,9 @@ def chat_with_db(user_query: str, project_id: str, repo: TraceRepository, tools:
         tool_name = tool_call.name
         tool_args = dict(tool_call.args)
 
-        # Execute the requested tool
+        # tools
         tool_output_content = ""
         if tool_name == "get_traces_by_project_id":
-            # The model will call this function without the project_id arg,
-            # so we add it here from the request context.
             tool_args["project_id"] = project_id
             tool_output_content = db_tools.get_traces_by_project_id(repo, **tool_args)
         elif tool_name == "get_spans_by_trace_id":
@@ -56,15 +50,13 @@ def chat_with_db(user_query: str, project_id: str, repo: TraceRepository, tools:
         else:
             tool_output_content = json.dumps({"error": f"Unknown tool: {tool_name}"})
 
-        # Create the tool output object for the model
+        # output the tool response
         tool_output = protos.FunctionResponse(
             name=tool_name,
             response={"content": tool_output_content},
         )
 
-        # Send the tool output back to the model to get a natural language response
         final_response = chat.send_message(tool_output)
         return final_response.text
     else:
-        # The model decided no tool was needed and returned text directly.
         return first_part.text

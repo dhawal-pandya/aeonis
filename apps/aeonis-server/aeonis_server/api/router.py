@@ -14,7 +14,9 @@ router = APIRouter()
 def get_repository(db: Session = Depends(get_db)) -> TraceRepository:
     return PostgresTraceRepository(db)
 
+
 # --- AI Chat API ---
+
 
 @router.post("/projects/{project_id}/chat", tags=["AI Chat"])
 async def project_chat(
@@ -117,7 +119,7 @@ async def get_trace_by_id(
     return spans
 
 
-# --- Debug API ---
+# only for testing
 
 
 @router.post("/debug/clear-database", tags=["Debug"])

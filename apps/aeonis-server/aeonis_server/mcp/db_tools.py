@@ -27,11 +27,9 @@ def execute_sql_query(repo: TraceRepository, query: str) -> str:
     """
     if not query.strip().upper().startswith("SELECT"):
         raise ValueError("Only SELECT statements are allowed for security reasons.")
-    
+
     try:
         result = repo.execute_sql(query)
-        # The result will be a list of rows, which can be serialized to JSON.
         return json.dumps(result)
     except Exception as e:
-        # It's important to return error messages to the LLM
         return json.dumps({"error": str(e)})

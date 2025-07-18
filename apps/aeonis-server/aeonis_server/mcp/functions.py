@@ -40,7 +40,6 @@ EXECUTE_SQL_QUERY = FunctionDeclaration(
     },
 )
 
-# Create a Tool object from the function declarations
 DB_TOOLS = Tool(
     function_declarations=[
         GET_TRACES_BY_PROJECT_ID,

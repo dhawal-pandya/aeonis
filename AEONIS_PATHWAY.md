@@ -1,10 +1,8 @@
-# Aeonis Pathway: A Developer's Guide
-
-This document outlines the complete workflow of the Aeonis observability platform, from instrumenting an application with the Go SDK to analyzing traces and chatting with your data in the UI.
+# Developer's Guide
 
 ## 1. Instrumenting Your Application with the Aeonis Go SDK
 
-The first step is to instrument your Go application to send trace data to the Aeonis server. We provide a Go SDK for this purpose.
+The first step is to instrument your Go application to send trace data to the Aeonis server. Use Go SDK for this purpose.
 
 ### 1.1. How the SDK Works
 
