@@ -1,0 +1,262 @@
+INFO:     2025-07-20 21:40:08,629 - Started server process [51038]
+INFO:     2025-07-20 21:40:08,629 - Started server process [51038]
+INFO:     2025-07-20 21:40:08,629 - Started server process [51038]
+INFO:     2025-07-20 21:40:08,629 - Waiting for application startup.
+INFO:     2025-07-20 21:40:08,629 - Waiting for application startup.
+INFO:     2025-07-20 21:40:08,629 - Waiting for application startup.
+INFO:     2025-07-20 21:40:08,662 - Application startup complete.
+INFO:     2025-07-20 21:40:08,662 - Application startup complete.
+INFO:     2025-07-20 21:40:08,662 - Application startup complete.
+INFO:     2025-07-20 21:40:08,663 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-07-20 21:40:08,663 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-07-20 21:40:08,663 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-07-20 21:40:20,174 - Executing SQL query from tool call: {'query': 'SELECT COUNT(*) FROM spans WHERE project_id = :project_id', 'params': {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}}
+INFO:     2025-07-20 21:40:20,176 - Executing query: SELECT COUNT(*) FROM spans WHERE project_id = :project_id with params: {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}
+INFO:     2025-07-20 21:40:21,075 - 127.0.0.1:60382 - "POST /v1/projects/3fcc8a61-c683-4906-a48a-675d9545a871/chat HTTP/1.1" 200
+INFO:     2025-07-20 21:41:01,728 - Started server process [51124]
+INFO:     2025-07-20 21:41:01,728 - Started server process [51124]
+INFO:     2025-07-20 21:41:01,728 - Started server process [51124]
+INFO:     2025-07-20 21:41:01,728 - Waiting for application startup.
+INFO:     2025-07-20 21:41:01,728 - Waiting for application startup.
+INFO:     2025-07-20 21:41:01,728 - Waiting for application startup.
+INFO:     2025-07-20 21:41:01,754 - Application startup complete.
+INFO:     2025-07-20 21:41:01,754 - Application startup complete.
+INFO:     2025-07-20 21:41:01,754 - Application startup complete.
+INFO:     2025-07-20 21:41:01,754 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-07-20 21:41:01,754 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-07-20 21:41:01,754 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-07-20 21:41:13,467 - Executing SQL query from tool call: {'query': 'SELECT COUNT(*) FROM spans WHERE project_id = :project_id', 'params': {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}}
+INFO:     2025-07-20 21:41:13,468 - Executing query: SELECT COUNT(*) FROM spans WHERE project_id = :project_id with params: {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}
+INFO:     2025-07-20 21:41:14,523 - 127.0.0.1:60394 - "POST /v1/projects/3fcc8a61-c683-4906-a48a-675d9545a871/chat HTTP/1.1" 200
+INFO:     2025-07-20 21:46:08,390 - Executing SQL query from tool call: {'query': 'SELECT count(*) FROM spans WHERE project_id = :project_id', 'params': {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}}
+INFO:     2025-07-20 21:46:08,391 - Executing query: SELECT count(*) FROM spans WHERE project_id = :project_id with params: {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}
+INFO:     2025-07-20 21:46:09,534 - 127.0.0.1:60425 - "POST /v1/projects/3fcc8a61-c683-4906-a48a-675d9545a871/chat HTTP/1.1" 200
+INFO:     2025-07-20 21:46:48,689 - Started server process [51405]
+INFO:     2025-07-20 21:46:48,689 - Started server process [51405]
+INFO:     2025-07-20 21:46:48,689 - Started server process [51405]
+INFO:     2025-07-20 21:46:48,689 - Waiting for application startup.
+INFO:     2025-07-20 21:46:48,689 - Waiting for application startup.
+INFO:     2025-07-20 21:46:48,689 - Waiting for application startup.
+INFO:     2025-07-20 21:46:48,720 - Application startup complete.
+INFO:     2025-07-20 21:46:48,720 - Application startup complete.
+INFO:     2025-07-20 21:46:48,720 - Application startup complete.
+INFO:     2025-07-20 21:46:48,722 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-07-20 21:46:48,722 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-07-20 21:46:48,722 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-07-20 21:47:02,884 - Executing SQL query from tool call: {'query': 'SELECT COUNT(*) FROM spans WHERE project_id = :project_id', 'params': {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}}
+INFO:     2025-07-20 21:47:02,884 - Executing query: SELECT COUNT(*) FROM spans WHERE project_id = :project_id with params: {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}
+INFO:     2025-07-20 21:47:05,142 - 127.0.0.1:60435 - "POST /v1/projects/3fcc8a61-c683-4906-a48a-675d9545a871/chat HTTP/1.1" 200
+INFO:     2025-07-20 21:47:42,702 - Started server process [51498]
+INFO:     2025-07-20 21:47:42,702 - Started server process [51498]
+INFO:     2025-07-20 21:47:42,702 - Started server process [51498]
+INFO:     2025-07-20 21:47:42,703 - Waiting for application startup.
+INFO:     2025-07-20 21:47:42,703 - Waiting for application startup.
+INFO:     2025-07-20 21:47:42,703 - Waiting for application startup.
+INFO:     2025-07-20 21:47:42,733 - Application startup complete.
+INFO:     2025-07-20 21:47:42,733 - Application startup complete.
+INFO:     2025-07-20 21:47:42,733 - Application startup complete.
+INFO:     2025-07-20 21:47:42,734 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-07-20 21:47:42,734 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-07-20 21:47:42,734 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-07-20 21:47:55,827 - Executing SQL query from tool call: {'query': 'SELECT COUNT(*) FROM spans WHERE project_id = :project_id', 'params': {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}}
+INFO:     2025-07-20 21:47:55,827 - Executing query: SELECT COUNT(*) FROM spans WHERE project_id = :project_id with params: {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}
+INFO:     2025-07-20 21:47:56,471 - 127.0.0.1:60446 - "POST /v1/projects/3fcc8a61-c683-4906-a48a-675d9545a871/chat HTTP/1.1" 200
+INFO:     2025-07-20 21:48:27,444 - Started server process [51583]
+INFO:     2025-07-20 21:48:27,444 - Started server process [51583]
+INFO:     2025-07-20 21:48:27,444 - Started server process [51583]
+INFO:     2025-07-20 21:48:27,444 - Waiting for application startup.
+INFO:     2025-07-20 21:48:27,444 - Waiting for application startup.
+INFO:     2025-07-20 21:48:27,444 - Waiting for application startup.
+INFO:     2025-07-20 21:48:27,471 - Application startup complete.
+INFO:     2025-07-20 21:48:27,471 - Application startup complete.
+INFO:     2025-07-20 21:48:27,471 - Application startup complete.
+INFO:     2025-07-20 21:48:27,471 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-07-20 21:48:27,471 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-07-20 21:48:27,471 - Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     2025-07-20 21:48:41,305 - Executing SQL query from tool call: {'query': 'SELECT COUNT(*) FROM spans WHERE project_id = :project_id', 'params': {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}}
+INFO:     2025-07-20 21:48:41,306 - Executing query: SELECT COUNT(*) FROM spans WHERE project_id = :project_id with params: {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}
+INFO:     2025-07-20 21:48:42,252 - 127.0.0.1:60458 - "POST /v1/projects/3fcc8a61-c683-4906-a48a-675d9545a871/chat HTTP/1.1" 200
+INFO:     2025-07-20 21:48:58,488 - 127.0.0.1:60636 - "POST /v1/projects/3fcc8a61-c683-4906-a48a-675d9545a871/chat HTTP/1.1" 500
+ERROR:    2025-07-20 21:48:58,488 - Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/api/router.py", line 48, in project_chat
+    response_text = llm_service.chat_with_db(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/mcp/llm_service.py", line 84, in chat_with_db
+    return final_response.text
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/google/generativeai/types/generation_types.py", line 536, in text
+    raise ValueError(f"Could not convert `part.{part_type}` to text.")
+ValueError: Could not convert `part.function_call` to text.
+ERROR:    2025-07-20 21:48:58,488 - Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/api/router.py", line 48, in project_chat
+    response_text = llm_service.chat_with_db(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/mcp/llm_service.py", line 84, in chat_with_db
+    return final_response.text
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/google/generativeai/types/generation_types.py", line 536, in text
+    raise ValueError(f"Could not convert `part.{part_type}` to text.")
+ValueError: Could not convert `part.function_call` to text.
+ERROR:    2025-07-20 21:48:58,488 - Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/api/router.py", line 48, in project_chat
+    response_text = llm_service.chat_with_db(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/mcp/llm_service.py", line 84, in chat_with_db
+    return final_response.text
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/google/generativeai/types/generation_types.py", line 536, in text
+    raise ValueError(f"Could not convert `part.{part_type}` to text.")
+ValueError: Could not convert `part.function_call` to text.
+INFO:     2025-07-20 21:49:42,327 - Started server process [51715]
+INFO:     2025-07-20 21:49:42,327 - Started server process [51715]
+INFO:     2025-07-20 21:49:42,327 - Started server process [51715]
+INFO:     2025-07-20 21:49:42,327 - Waiting for application startup.
+INFO:     2025-07-20 21:49:42,327 - Waiting for application startup.
+INFO:     2025-07-20 21:49:42,327 - Waiting for application startup.
+INFO:     2025-07-20 21:49:42,350 - Application startup complete.
+INFO:     2025-07-20 21:49:42,350 - Application startup complete.
+INFO:     2025-07-20 21:49:42,350 - Application startup complete.
+ERROR:    2025-07-20 21:49:42,351 - [Errno 48] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+ERROR:    2025-07-20 21:49:42,351 - [Errno 48] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+ERROR:    2025-07-20 21:49:42,351 - [Errno 48] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     2025-07-20 21:49:42,351 - Waiting for application shutdown.
+INFO:     2025-07-20 21:49:42,351 - Waiting for application shutdown.
+INFO:     2025-07-20 21:49:42,351 - Waiting for application shutdown.
+INFO:     2025-07-20 21:49:42,351 - Application shutdown complete.
+INFO:     2025-07-20 21:49:42,351 - Application shutdown complete.
+INFO:     2025-07-20 21:49:42,351 - Application shutdown complete.
+INFO:     2025-07-20 21:49:54,941 - Executing SQL query from tool call: {'query': 'SELECT COUNT(*) FROM spans WHERE project_id = :project_id', 'params': {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}}
+INFO:     2025-07-20 21:49:54,941 - Executing query: SELECT COUNT(*) FROM spans WHERE project_id = :project_id with params: {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}
+INFO:     2025-07-20 21:49:56,897 - 127.0.0.1:60648 - "POST /v1/projects/3fcc8a61-c683-4906-a48a-675d9545a871/chat HTTP/1.1" 200

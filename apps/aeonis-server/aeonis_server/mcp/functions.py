@@ -29,7 +29,7 @@ GET_COMMIT_HISTORY = FunctionDeclaration(
         "type": "object",
         "properties": {
             "branch": {"type": "string", "description": "The branch name to get history for."},
-            "limit": {"type": "integer", "description": "The maximum number of commits to return.", "default": 10},
+            "limit": {"type": "integer", "description": "The maximum number of commits to return. Defaults to 10 if not specified."},
         },
         "required": ["branch"],
     },

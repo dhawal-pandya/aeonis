@@ -1,10 +1,14 @@
 import os
 import json
+import logging
 import google.generativeai as genai
 from google.generativeai import protos
 from .prompts import SYSTEM_PROMPT
 from ..db.repository import TraceRepository
 from . import db_tools, git_tools
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 # Configure the Gemini API key
 API_KEY = os.getenv("GEMINI_API_KEY")
@@ -42,7 +46,20 @@ def chat_with_db(user_query: str, project_id: str, repo: TraceRepository, tools:
         tool_output_content = ""
         # Database Tools
         if tool_name == "execute_sql_query":
-            tool_output_content = db_tools.execute_sql_query(repo, **tool_args)
+            try:
+                # Force the project_id into the params for security and correctness
+                if "params" not in tool_args:
+                    tool_args["params"] = {}
+                tool_args["params"]["project_id"] = project_id
+
+                # Convert MapComposite to a regular dict before passing it to the tool
+                tool_args["params"] = dict(tool_args["params"])
+
+                logger.info(f"Executing SQL query from tool call: {tool_args}")
+                tool_output_content = db_tools.execute_sql_query(repo, **tool_args)
+            except Exception as e:
+                logger.error(f"Error executing SQL query: {tool_args}", exc_info=True)
+                tool_output_content = json.dumps({"error": f"Failed to execute query: {e}"})
         # Git Tools
         elif tool_name == "list_branches":
             tool_output_content = git_tools.list_branches(project_id, repo)
@@ -61,7 +78,9 @@ def chat_with_db(user_query: str, project_id: str, repo: TraceRepository, tools:
             response={"content": tool_output_content},
         )
 
-        final_response = chat.send_message(tool_output)
+        final_response = chat.send_message(
+            protos.Part(function_response=tool_output)
+        )
         return final_response.text
     else:
         # If no tool call, return the direct text response

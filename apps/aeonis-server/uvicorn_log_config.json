@@ -21,6 +21,10 @@
             "backupCount": 3
         }
     },
+    "root": {
+        "handlers": ["default", "file"],
+        "level": "INFO"
+    },
     "loggers": {
         "uvicorn": {
             "handlers": ["default", "file"],
