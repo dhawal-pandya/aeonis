@@ -17,6 +17,8 @@ type Tracer struct {
 	serviceName       string
 	exporter          Exporter
 	sanitizer         Sanitizer
+	commitID          string
+	sdkVersion        string
 	resourceAttributes map[string]interface{}
 }
 
@@ -37,16 +39,13 @@ func NewTracerWithExporter(serviceName string, exporter Exporter, sanitizer Sani
 		commitID = "local"
 	}
 
-	resourceAttributes := map[string]interface{}{
-		"telemetry.sdk.version": tracerVersion,
-		"service.version":       commitID,
-	}
-
 	return &Tracer{
 		serviceName:       serviceName,
 		exporter:          exporter,
 		sanitizer:         sanitizer,
-		resourceAttributes: resourceAttributes,
+		commitID:          commitID,
+		sdkVersion:        tracerVersion,
+		resourceAttributes: make(map[string]interface{}),
 	}
 }
 
@@ -61,6 +60,8 @@ func (t *Tracer) StartSpan(ctx context.Context, name string) (context.Context, *
 		tracer:     t,
 		exporter:   t.exporter,
 		sanitizer:  t.sanitizer,
+		CommitID:   t.commitID,
+		SDKVersion: t.sdkVersion,
 	}
 
 	// Add resource attributes to the span

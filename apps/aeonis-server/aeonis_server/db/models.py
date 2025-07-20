@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, DateTime, ForeignKey, JSON
+from sqlalchemy import Column, String, DateTime, ForeignKey, JSON, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from .database import Base
@@ -9,6 +9,9 @@ class Project(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
     api_key = Column(String, unique=True, nullable=False, index=True)
+    git_repo_url = Column(String, nullable=True)
+    is_private = Column(Boolean, default=False, nullable=False)
+    git_ssh_key = Column(String, nullable=True) # TODO: Encrypt this value at rest
 
     spans = relationship("Span", back_populates="project")
 
@@ -16,6 +19,8 @@ class Project(Base):
         return {
             "id": str(self.id),
             "name": self.name,
+            "git_repo_url": self.git_repo_url,
+            "is_private": self.is_private,
         }
 
 class Span(Base):

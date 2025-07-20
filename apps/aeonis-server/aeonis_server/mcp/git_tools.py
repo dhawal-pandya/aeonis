@@ -1,40 +1,119 @@
 import git
+import os
+import shutil
 from functools import lru_cache
+from ..db.repository import TraceRepository
 
 # This would be loaded from config in a real app
-GIT_REPO_PATH = "/Users/dhawalpandya/Sandbox/aeonis" # Using the full path for now
+REPO_CACHE_DIR = "/tmp/aeonis_repos"
 
-@lru_cache(maxsize=1)
-def get_repo():
+import git
+import os
+import shutil
+import tempfile
+from functools import lru_cache
+from ..db.repository import TraceRepository
+
+# This would be loaded from config in a real app
+REPO_CACHE_DIR = "/tmp/aeonis_repos"
+
+@lru_cache(maxsize=32) # Cache up to 32 repositories
+def get_repo(project_id: str, repo: TraceRepository):
     """
-    Returns a cached git.Repo object.
-    Using lru_cache to ensure we don't re-initialize the Repo object on every call.
+    Returns a cached git.Repo object for a given project_id.
+    Clones the repo if it's not already cached.
+    Handles both public and private repositories (via SSH key).
     """
-    try:
-        repo = git.Repo(GIT_REPO_PATH, search_parent_directories=True)
-        return repo
-    except git.exc.InvalidGitRepositoryError:
-        # Handle case where the path is not a git repo
+    project = repo.get_project_by_id(project_id)
+    if not project or not project.git_repo_url:
         return None
 
-def list_branches():
-    """Lists all branches in the repository."""
-    repo = get_repo()
-    if not repo:
-        return {"error": "Git repository not found."}
-    
-    return [head.name for head in repo.heads]
+    repo_dir = os.path.join(REPO_CACHE_DIR, str(project.id))
 
-def get_commit_history(branch: str, limit: int = 10):
+    # If repo is already cached, pull latest changes
+    if os.path.exists(repo_dir):
+        try:
+            git_repo = git.Repo(repo_dir)
+            # For private repos, we need to set up the SSH environment for pulling too
+            if project.is_private and project.git_ssh_key:
+                with tempfile.NamedTemporaryFile(delete=False, mode='w') as tmp:
+                    tmp.write(project.git_ssh_key)
+                    ssh_key_path = tmp.name
+                
+                ssh_cmd = f"ssh -i {ssh_key_path} -o StrictHostKeyChecking=no"
+                with git_repo.git.custom_environment(GIT_SSH_COMMAND=ssh_cmd):
+                    git_repo.remotes.origin.pull()
+                
+                os.unlink(ssh_key_path) # Clean up the key
+            else:
+                 git_repo.remotes.origin.pull()
+
+            return git_repo
+        except git.exc.InvalidGitRepositoryError:
+            shutil.rmtree(repo_dir) # clean up corrupted repo
+        except git.exc.GitCommandError as e:
+            # Could be an auth error, let's try re-cloning
+            print(f"Error pulling repo for project {project_id}, will try re-cloning: {e}")
+            shutil.rmtree(repo_dir)
+
+
+    # If not cached, clone it
+    try:
+        if project.is_private and project.git_ssh_key:
+            # Create a temporary file for the SSH key
+            with tempfile.NamedTemporaryFile(delete=False, mode='w') as tmp:
+                tmp.write(project.git_ssh_key)
+                ssh_key_path = tmp.name
+            
+            # Set up the SSH command to use the key
+            ssh_cmd = f"ssh -i {ssh_key_path} -o StrictHostKeyChecking=no"
+            
+            # Clone with the custom SSH environment
+            git.Repo.clone_from(
+                project.git_repo_url, 
+                repo_dir, 
+                env={"GIT_SSH_COMMAND": ssh_cmd}
+            )
+            
+            # IMPORTANT: Clean up the temporary key file
+            os.unlink(ssh_key_path)
+            
+            return git.Repo(repo_dir)
+        else:
+            # Public repo, clone normally
+            git_repo = git.Repo.clone_from(project.git_repo_url, repo_dir)
+            return git_repo
+
+    except git.exc.GitCommandError as e:
+        print(f"Error cloning repo for project {project_id}: {e}")
+        # Clean up a failed clone attempt
+        if os.path.exists(repo_dir):
+            shutil.rmtree(repo_dir)
+        # Also clean up the key if it exists
+        if 'ssh_key_path' in locals() and os.path.exists(ssh_key_path):
+            os.unlink(ssh_key_path)
+        return None
+
+
+
+def list_branches(project_id: str, repo: TraceRepository):
+    """Lists all branches in the repository."""
+    git_repo = get_repo(project_id, repo)
+    if not git_repo:
+        return {"error": "Git repository not found for this project."}
+    
+    return [head.name for head in git_repo.heads]
+
+def get_commit_history(project_id: str, repo: TraceRepository, branch: str, limit: int = 10):
     """
     Returns the commit history for a given branch.
     """
-    repo = get_repo()
-    if not repo:
-        return {"error": "Git repository not found."}
+    git_repo = get_repo(project_id, repo)
+    if not git_repo:
+        return {"error": "Git repository not found for this project."}
         
     try:
-        commits = list(repo.iter_commits(branch, max_count=limit))
+        commits = list(git_repo.iter_commits(branch, max_count=limit))
         return [
             {
                 "hash": c.hexsha,
@@ -47,35 +126,38 @@ def get_commit_history(branch: str, limit: int = 10):
     except git.exc.GitCommandError as e:
         return {"error": f"Could not find branch '{branch}'. Details: {e}"}
 
-def get_commit_diff(commit_hash: str):
+def get_commit_diff(project_id: str, repo: TraceRepository, commit_hash: str):
     """
     Returns the diff for a specific commit.
     """
-    repo = get_repo()
-    if not repo:
-        return {"error": "Git repository not found."}
+    git_repo = get_repo(project_id, repo)
+    if not git_repo:
+        return {"error": "Git repository not found for this project."}
 
     try:
-        commit = repo.commit(commit_hash)
+        commit = git_repo.commit(commit_hash)
         # The diff is against the first parent of the commit
-        diff_text = commit.tree.diff_to_tree(commit.parents[0]).__str__()
+        diffs = commit.diff(commit.parents[0])
+        diff_text = "\n".join([str(d) for d in diffs])
         return {"hash": commit_hash, "diff": diff_text}
     except (git.exc.BadName, IndexError) as e:
         # Handle case for initial commit (no parents) or invalid hash
         if not commit.parents:
-            return {"hash": commit_hash, "diff": commit.tree.diff_to_tree(None).__str__()}
+            diffs = commit.diff(None)
+            diff_text = "\n".join([str(d) for d in diffs])
+            return {"hash": commit_hash, "diff": diff_text}
         return {"error": f"Could not find commit '{commit_hash}'. Details: {e}"}
 
-def read_file_at_commit(file_path: str, commit_hash: str):
+def read_file_at_commit(project_id: str, repo: TraceRepository, file_path: str, commit_hash: str):
     """
     Reads the content of a file at a specific commit.
     """
-    repo = get_repo()
-    if not repo:
-        return {"error": "Git repository not found."}
+    git_repo = get_repo(project_id, repo)
+    if not git_repo:
+        return {"error": "Git repository not found for this project."}
         
     try:
-        commit = repo.commit(commit_hash)
+        commit = git_repo.commit(commit_hash)
         blob = commit.tree / file_path
         return {"file_content": blob.data_stream.read().decode("utf-8")}
     except (KeyError, git.exc.BadName) as e:

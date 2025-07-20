@@ -1,30 +1,6 @@
 from google.generativeai.types import FunctionDeclaration, Tool
 
 # --- Database Tool Declarations ---
-GET_TRACES_BY_PROJECT_ID = FunctionDeclaration(
-    name="get_traces_by_project_id",
-    description="Fetches the most recent traces for a given project ID.",
-    parameters={
-        "type": "object",
-        "properties": {
-            "project_id": {"type": "string", "description": "The UUID of the project."},
-        },
-        "required": ["project_id"],
-    },
-)
-
-GET_SPANS_BY_TRACE_ID = FunctionDeclaration(
-    name="get_spans_by_trace_id",
-    description="Fetches all spans for a given trace ID.",
-    parameters={
-        "type": "object",
-        "properties": {
-            "trace_id": {"type": "string", "description": "The ID of the trace."},
-        },
-        "required": ["trace_id"],
-    },
-)
-
 EXECUTE_SQL_QUERY = FunctionDeclaration(
     name="execute_sql_query",
     description="Executes a read-only SQL query (SELECT) against the database.",
@@ -88,8 +64,6 @@ READ_FILE_AT_COMMIT = FunctionDeclaration(
 # --- Tool Definitions ---
 DB_TOOLS = Tool(
     function_declarations=[
-        GET_TRACES_BY_PROJECT_ID,
-        GET_SPANS_BY_TRACE_ID,
         EXECUTE_SQL_QUERY,
     ]
 )

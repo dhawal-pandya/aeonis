@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request, HTTPException, Depends, Header
-from typing import List, Dict, Any
+from pydantic import BaseModel, Field
+from typing import List, Dict, Any, Optional
 import uuid
 from sqlalchemy.orm import Session
 from ..db.database import get_db
@@ -11,8 +12,19 @@ from ..mcp.functions import ALL_TOOLS
 router = APIRouter()
 
 
+# --- Pydantic Models ---
+
+class CreateProjectRequest(BaseModel):
+    name: str
+    git_repo_url: Optional[str] = None
+    is_private: bool = False
+    git_ssh_key: Optional[str] = None
+
+# --- Helper Functions ---
+
 def get_repository(db: Session = Depends(get_db)) -> TraceRepository:
     return PostgresTraceRepository(db)
+
 
 
 # --- AI Chat API ---
@@ -51,9 +63,14 @@ async def get_all_projects(repo: TraceRepository = Depends(get_repository)):
 
 
 @router.post("/projects", tags=["Projects"])
-async def create_project(name: str, repo: TraceRepository = Depends(get_repository)):
+async def create_project(project_data: CreateProjectRequest, repo: TraceRepository = Depends(get_repository)):
     """Creates a new project and returns it, including the API key."""
-    return repo.create_project(name)
+    return repo.create_project(
+        name=project_data.name,
+        git_repo_url=project_data.git_repo_url,
+        is_private=project_data.is_private,
+        git_ssh_key=project_data.git_ssh_key
+    )
 
 
 @router.delete("/projects/{project_id}", tags=["Projects"])

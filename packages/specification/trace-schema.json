@@ -4,6 +4,11 @@
   "description": "A single unit of work in an Aeonis trace.",
   "type": "object",
   "properties": {
+    "project_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The ID of the project this span belongs to."
+    },
     "trace_id": {
       "type": "string",
       "format": "uuid"
@@ -15,6 +20,14 @@
     "parent_span_id": {
       "type": "string",
       "format": "uuid"
+    },
+    "commit_id": {
+      "type": "string",
+      "description": "The Git commit hash of the running service."
+    },
+    "sdk_version": {
+      "type": "string",
+      "description": "The version of the Aeonis SDK used for instrumentation."
     },
     "name": {
       "type": "string",
@@ -35,19 +48,6 @@
         "service.name": {
           "type": "string",
           "description": "The logical name of the service. (e.g., 'aeonis-server', 'billing-service')."
-        },
-        "service.version": {
-          "type": "string",
-          "description": "The version of the service, typically the Git commit hash."
-        },
-        "telemetry.sdk.name": {
-          "type": "string",
-          "default": "aeonis",
-          "description": "The name of the SDK."
-        },
-        "telemetry.sdk.version": {
-          "type": "string",
-          "description": "The version of the Aeonis SDK used for instrumentation."
         }
       },
       "additionalProperties": true
@@ -65,6 +65,7 @@
     }
   },
   "required": [
+    "project_id",
     "trace_id",
     "span_id",
     "name",

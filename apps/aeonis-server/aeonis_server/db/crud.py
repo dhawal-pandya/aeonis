@@ -17,14 +17,8 @@ class PostgresTraceRepository(TraceRepository):
     def add_spans(self, spans: List[Dict[str, Any]], project_id: uuid.UUID):
         db_spans = []
         for span_data in spans:
-            attributes = span_data.get("attributes", {})
-            commit_id = attributes.pop("service.version", None)
-            sdk_version = attributes.pop("telemetry.sdk.version", None)
-            
-            span_data["attributes"] = attributes
-            span_data["commit_id"] = commit_id
-            span_data["sdk_version"] = sdk_version
-            
+            # The Span model will now correctly map commit_id and sdk_version from the top level
+            # while also preserving the attributes dictionary.
             db_spans.append(models.Span(**span_data, project_id=project_id))
             
         self.db.add_all(db_spans)
@@ -80,15 +74,23 @@ class PostgresTraceRepository(TraceRepository):
             .all()
         )
 
+    def get_project_by_id(self, project_id: uuid.UUID) -> models.Project:
+        return self.db.query(models.Project).filter(models.Project.id == project_id).first()
+
     def get_all_projects(self) -> List[models.Project]:
         return self.db.query(models.Project).all()
 
-    def create_project(self, name: str) -> models.Project:
+    def create_project(self, name: str, git_repo_url: str = None, is_private: bool = False, git_ssh_key: str = None) -> models.Project:
         import secrets
+        # TODO: Implement actual encryption for the SSH key before storing it.
+        # For now, it's stored in plaintext which is NOT secure.
         project = models.Project(
             id=uuid.uuid4(),
             name=name,
-            api_key=secrets.token_urlsafe(32)
+            api_key=secrets.token_urlsafe(32),
+            git_repo_url=git_repo_url,
+            is_private=is_private,
+            git_ssh_key=git_ssh_key
         )
         self.db.add(project)
         self.db.commit()

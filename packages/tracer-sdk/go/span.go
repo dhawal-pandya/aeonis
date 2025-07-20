@@ -9,6 +9,8 @@ type Span struct {
 	TraceID      string                 `json:"trace_id"`
 	SpanID       string                 `json:"span_id"`
 	ParentSpanID string                 `json:"parent_span_id,omitempty"`
+	CommitID     string                 `json:"commit_id,omitempty"`
+	SDKVersion   string                 `json:"sdk_version,omitempty"`
 	Name         string                 `json:"name"`
 	StartTime    time.Time              `json:"start_time"`
 	EndTime      time.Time              `json:"end_time"`

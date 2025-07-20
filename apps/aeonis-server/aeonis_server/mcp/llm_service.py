@@ -20,7 +20,7 @@ def chat_with_db(user_query: str, project_id: str, repo: TraceRepository, tools:
     system_instruction = f"{SYSTEM_PROMPT}\n\n**Current Project Context:** You are currently operating on `project_id`: `{project_id}`."
 
     model = genai.GenerativeModel(
-        "gemini-2.5-flash",
+        "gemini-1.5-flash",
         system_instruction=system_instruction,
         tools=tools,
     )
@@ -41,22 +41,17 @@ def chat_with_db(user_query: str, project_id: str, repo: TraceRepository, tools:
         # --- Tool Dispatch ---
         tool_output_content = ""
         # Database Tools
-        if tool_name == "get_traces_by_project_id":
-            tool_args["project_id"] = project_id
-            tool_output_content = db_tools.get_traces_by_project_id(repo, **tool_args)
-        elif tool_name == "get_spans_by_trace_id":
-            tool_output_content = db_tools.get_spans_by_trace_id(repo, **tool_args)
-        elif tool_name == "execute_sql_query":
+        if tool_name == "execute_sql_query":
             tool_output_content = db_tools.execute_sql_query(repo, **tool_args)
         # Git Tools
         elif tool_name == "list_branches":
-            tool_output_content = git_tools.list_branches()
+            tool_output_content = git_tools.list_branches(project_id, repo)
         elif tool_name == "get_commit_history":
-            tool_output_content = git_tools.get_commit_history(**tool_args)
+            tool_output_content = git_tools.get_commit_history(project_id, repo, **tool_args)
         elif tool_name == "get_commit_diff":
-            tool_output_content = git_tools.get_commit_diff(**tool_args)
+            tool_output_content = git_tools.get_commit_diff(project_id, repo, **tool_args)
         elif tool_name == "read_file_at_commit":
-            tool_output_content = git_tools.read_file_at_commit(**tool_args)
+            tool_output_content = git_tools.read_file_at_commit(project_id, repo, **tool_args)
         else:
             tool_output_content = json.dumps({"error": f"Unknown tool: {tool_name}"})
 
