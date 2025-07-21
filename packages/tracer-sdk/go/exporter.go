@@ -9,17 +9,17 @@ import (
 	"time"
 )
 
-// Exporter is the interface for exporting spans.
+// exporter is the interface for exporting spans.
 type Exporter interface {
 	Export(span *Span)
 }
 
-// FileExporter writes spans to a file.
+// fileexporter writes spans to a file.
 type FileExporter struct {
 	file *os.File
 }
 
-// NewFileExporter creates a new file exporter.
+// newfileexporter creates a new file exporter.
 func NewFileExporter(filename string) *FileExporter {
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -28,7 +28,7 @@ func NewFileExporter(filename string) *FileExporter {
 	return &FileExporter{file: f}
 }
 
-// Export writes a span to the file.
+// export writes a span to the file.
 func (e *FileExporter) Export(span *Span) {
 	data, err := json.Marshal(span)
 	if err != nil {
@@ -40,14 +40,14 @@ func (e *FileExporter) Export(span *Span) {
 	}
 }
 
-// Close closes the file.
+// close closes the file.
 func (e *FileExporter) Close() {
 	if err := e.file.Close(); err != nil {
 		log.Printf("failed to close file: %v", err)
 	}
 }
 
-// HTTPExporter sends spans to an HTTP endpoint.
+// httpexporter sends spans to an http endpoint.
 type HTTPExporter struct {
 	endpointURL string
 	apiKey      string
@@ -55,7 +55,7 @@ type HTTPExporter struct {
 	spanChannel chan *Span
 }
 
-// NewHTTPExporter creates a new HTTP exporter.
+// newhttpexporter creates a new http exporter.
 func NewHTTPExporter(endpointURL string, apiKey string) *HTTPExporter {
 	exporter := &HTTPExporter{
 		endpointURL: endpointURL,
@@ -69,7 +69,7 @@ func NewHTTPExporter(endpointURL string, apiKey string) *HTTPExporter {
 	return exporter
 }
 
-// Export sends a span to the exporter's channel.
+// export sends a span to the exporter's channel.
 func (e *HTTPExporter) Export(span *Span) {
 	e.spanChannel <- span
 }

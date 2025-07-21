@@ -12,7 +12,7 @@ from ..mcp.functions import ALL_TOOLS
 router = APIRouter()
 
 
-# --- Pydantic Models ---
+# pydantic models
 
 class CreateProjectRequest(BaseModel):
     name: str
@@ -20,14 +20,14 @@ class CreateProjectRequest(BaseModel):
     is_private: bool = False
     git_ssh_key: Optional[str] = None
 
-# --- Helper Functions ---
+# helper functions
 
 def get_repository(db: Session = Depends(get_db)) -> TraceRepository:
     return PostgresTraceRepository(db)
 
 
 
-# --- AI Chat API ---
+# ai chat api
 
 
 @router.post("/projects/{project_id}/chat", tags=["AI Chat"])
@@ -36,13 +36,13 @@ async def project_chat(
     request: Request,
     repo: TraceRepository = Depends(get_repository),
 ):
-    """Handles a chat message for a specific project."""
+    """handles a chat message for a project."""
     body = await request.json()
     user_query = body.get("message")
     if not user_query:
         raise HTTPException(status_code=400, detail="Message is required.")
 
-    # The llm_service handles the entire chat flow, now with all available tools
+    # llm_service handles chat flow with all tools
     response_text = llm_service.chat_with_db(
         user_query=user_query,
         project_id=str(project_id),
@@ -53,18 +53,18 @@ async def project_chat(
     return {"response": response_text}
 
 
-# --- Core Project API ---
+# core project api
 
 
 @router.get("/projects", tags=["Projects"])
 async def get_all_projects(repo: TraceRepository = Depends(get_repository)):
-    """Retrieves all projects."""
+    """retrieves all projects."""
     return repo.get_all_projects()
 
 
 @router.post("/projects", tags=["Projects"])
 async def create_project(project_data: CreateProjectRequest, repo: TraceRepository = Depends(get_repository)):
-    """Creates a new project and returns it, including the API key."""
+    """creates a new project, returns it with api key."""
     return repo.create_project(
         name=project_data.name,
         git_repo_url=project_data.git_repo_url,
@@ -77,14 +77,14 @@ async def create_project(project_data: CreateProjectRequest, repo: TraceReposito
 async def delete_project(
     project_id: uuid.UUID, repo: TraceRepository = Depends(get_repository)
 ):
-    """Deletes a project and all of its associated data (spans)."""
+    """deletes a project and its associated data (spans)."""
     deleted_count = repo.delete_project(project_id)
     if not deleted_count:
         raise HTTPException(status_code=404, detail="Project not found.")
     return {"status": "deleted", "project_id": project_id}
 
 
-# --- Core Traces API ---
+# core traces api
 
 
 @router.post("/traces", tags=["Traces"])
@@ -93,7 +93,7 @@ async def receive_traces(
     x_aeonis_api_key: str = Header(None),
     repo: TraceRepository = Depends(get_repository),
 ):
-    """Receives and persists a batch of spans."""
+    """receives and persists a batch of spans."""
     if not x_aeonis_api_key:
         raise HTTPException(
             status_code=401, detail="X-Aeonis-API-Key header is required."
@@ -115,7 +115,7 @@ async def receive_traces(
 async def get_project_traces(
     project_id: uuid.UUID, repo: TraceRepository = Depends(get_repository)
 ):
-    """Retrieves all traces for a given project, ordered by most recent."""
+    """retrieves all traces for a project, ordered by most recent."""
     try:
         return repo.get_traces_by_project_id(project_id)
     except Exception as e:
@@ -129,20 +129,20 @@ async def get_project_traces(
 async def get_trace_by_id(
     trace_id: str, repo: TraceRepository = Depends(get_repository)
 ):
-    """Retrieves all spans for a given trace ID."""
+    """retrieves all spans for a trace id."""
     spans = repo.get_spans_by_trace_id(trace_id)
     if not spans:
         raise HTTPException(status_code=404, detail="Trace not found.")
     return spans
 
 
-# only for testing
+# for testing only
 
 
 @router.post("/debug/clear-database", tags=["Debug"])
 async def clear_database(repo: TraceRepository = Depends(get_repository)):
     """
-    [FOR DEVELOPMENT ONLY] Deletes all data from the database by by dropping
+    [dev only] deletes all data from database by dropping
     and recreating all tables.
     """
     repo.delete_all_data()

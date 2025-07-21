@@ -260,3 +260,364 @@ INFO:     2025-07-20 21:49:42,351 - Application shutdown complete.
 INFO:     2025-07-20 21:49:54,941 - Executing SQL query from tool call: {'query': 'SELECT COUNT(*) FROM spans WHERE project_id = :project_id', 'params': {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}}
 INFO:     2025-07-20 21:49:54,941 - Executing query: SELECT COUNT(*) FROM spans WHERE project_id = :project_id with params: {'project_id': '3fcc8a61-c683-4906-a48a-675d9545a871'}
 INFO:     2025-07-20 21:49:56,897 - 127.0.0.1:60648 - "POST /v1/projects/3fcc8a61-c683-4906-a48a-675d9545a871/chat HTTP/1.1" 200
+INFO:     2025-07-20 21:55:50,758 - 127.0.0.1:60750 - "POST /v1/projects/3fcc8a61-c683-4906-a48a-675d9545a871/chat HTTP/1.1" 500
+ERROR:    2025-07-20 21:55:50,760 - Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/api/router.py", line 48, in project_chat
+    project_id=str(project_id),
+                ^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/mcp/llm_service.py", line 84, in chat_with_db
+    return final_response.text
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/google/generativeai/types/generation_types.py", line 536, in text
+    raise ValueError(f"Could not convert `part.{part_type}` to text.")
+ValueError: Could not convert `part.function_call` to text.
+ERROR:    2025-07-20 21:55:50,760 - Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/api/router.py", line 48, in project_chat
+    project_id=str(project_id),
+                ^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/mcp/llm_service.py", line 84, in chat_with_db
+    return final_response.text
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/google/generativeai/types/generation_types.py", line 536, in text
+    raise ValueError(f"Could not convert `part.{part_type}` to text.")
+ValueError: Could not convert `part.function_call` to text.
+ERROR:    2025-07-20 21:55:50,760 - Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/api/router.py", line 48, in project_chat
+    project_id=str(project_id),
+                ^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/mcp/llm_service.py", line 84, in chat_with_db
+    return final_response.text
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/google/generativeai/types/generation_types.py", line 536, in text
+    raise ValueError(f"Could not convert `part.{part_type}` to text.")
+ValueError: Could not convert `part.function_call` to text.
+INFO:     2025-07-20 21:56:29,889 - Started server process [52328]
+INFO:     2025-07-20 21:56:29,889 - Started server process [52328]
+INFO:     2025-07-20 21:56:29,889 - Started server process [52328]
+INFO:     2025-07-20 21:56:29,889 - Waiting for application startup.
+INFO:     2025-07-20 21:56:29,889 - Waiting for application startup.
+INFO:     2025-07-20 21:56:29,889 - Waiting for application startup.
+INFO:     2025-07-20 21:56:29,914 - Application startup complete.
+INFO:     2025-07-20 21:56:29,914 - Application startup complete.
+INFO:     2025-07-20 21:56:29,914 - Application startup complete.
+ERROR:    2025-07-20 21:56:29,915 - [Errno 48] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+ERROR:    2025-07-20 21:56:29,915 - [Errno 48] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+ERROR:    2025-07-20 21:56:29,915 - [Errno 48] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+INFO:     2025-07-20 21:56:29,915 - Waiting for application shutdown.
+INFO:     2025-07-20 21:56:29,915 - Waiting for application shutdown.
+INFO:     2025-07-20 21:56:29,915 - Waiting for application shutdown.
+INFO:     2025-07-20 21:56:29,915 - Application shutdown complete.
+INFO:     2025-07-20 21:56:29,915 - Application shutdown complete.
+INFO:     2025-07-20 21:56:29,915 - Application shutdown complete.
+INFO:     2025-07-20 21:56:43,797 - 127.0.0.1:60761 - "POST /v1/projects/3fcc8a61-c683-4906-a48a-675d9545a871/chat HTTP/1.1" 500
+ERROR:    2025-07-20 21:56:43,798 - Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/api/router.py", line 48, in project_chat
+    project_id=str(project_id),
+                ^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/mcp/llm_service.py", line 84, in chat_with_db
+    return final_response.text
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/google/generativeai/types/generation_types.py", line 536, in text
+    raise ValueError(f"Could not convert `part.{part_type}` to text.")
+ValueError: Could not convert `part.function_call` to text.
+ERROR:    2025-07-20 21:56:43,798 - Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/api/router.py", line 48, in project_chat
+    project_id=str(project_id),
+                ^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/mcp/llm_service.py", line 84, in chat_with_db
+    return final_response.text
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/google/generativeai/types/generation_types.py", line 536, in text
+    raise ValueError(f"Could not convert `part.{part_type}` to text.")
+ValueError: Could not convert `part.function_call` to text.
+ERROR:    2025-07-20 21:56:43,798 - Exception in ASGI application
+Traceback (most recent call last):
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 187, in __call__
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/starlette/routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/fastapi/routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/api/router.py", line 48, in project_chat
+    project_id=str(project_id),
+                ^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/aeonis_server/mcp/llm_service.py", line 84, in chat_with_db
+    return final_response.text
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/dhawalpandya/Sandbox/aeonis/apps/aeonis-server/.venv/lib/python3.12/site-packages/google/generativeai/types/generation_types.py", line 536, in text
+    raise ValueError(f"Could not convert `part.{part_type}` to text.")
+ValueError: Could not convert `part.function_call` to text.
+INFO:     2025-07-20 21:59:03,044 - 127.0.0.1:60775 - "GET /v1/projects/3fcc8a61-c683-4906-a48a-675d9545a871/traces HTTP/1.1" 200
+INFO:     2025-07-20 21:59:05,288 - 127.0.0.1:60777 - "GET /v1/traces/c5aba5e4-37be-48b0-8c10-9de920eb1c06 HTTP/1.1" 200
+INFO:     2025-07-20 21:59:06,287 - 127.0.0.1:60777 - "GET /v1/projects/3fcc8a61-c683-4906-a48a-675d9545a871/traces HTTP/1.1" 200
+INFO:     2025-07-20 21:59:07,703 - 127.0.0.1:60777 - "GET /v1/projects/3fcc8a61-c683-4906-a48a-675d9545a871/traces HTTP/1.1" 200
+INFO:     2025-07-20 21:59:07,708 - 127.0.0.1:60777 - "GET /v1/projects/3fcc8a61-c683-4906-a48a-675d9545a871/traces HTTP/1.1" 200
+INFO:     2025-07-20 21:59:32,182 - Shutting down
+INFO:     2025-07-20 21:59:32,182 - Shutting down
+INFO:     2025-07-20 21:59:32,182 - Shutting down
+INFO:     2025-07-20 21:59:32,283 - Waiting for application shutdown.
+INFO:     2025-07-20 21:59:32,283 - Waiting for application shutdown.
+INFO:     2025-07-20 21:59:32,283 - Waiting for application shutdown.
+INFO:     2025-07-20 21:59:32,284 - Application shutdown complete.
+INFO:     2025-07-20 21:59:32,284 - Application shutdown complete.
+INFO:     2025-07-20 21:59:32,284 - Application shutdown complete.
+INFO:     2025-07-20 21:59:32,284 - Finished server process [51583]
+INFO:     2025-07-20 21:59:32,284 - Finished server process [51583]
+INFO:     2025-07-20 21:59:32,284 - Finished server process [51583]

@@ -9,7 +9,7 @@ from .database import Base, engine
 
 import logging
 
-# Get a logger
+# get a logger
 logger = logging.getLogger(__name__)
 
 
@@ -29,12 +29,12 @@ class PostgresTraceRepository(TraceRepository):
         db_spans = []
         for span_data in spans:
             try:
-                # The Span model will now correctly map commit_id and sdk_version from the top level
-                # while also preserving the attributes dictionary.
+                # span model maps commit_id and sdk_version
+                # while preserving attributes dictionary.
                 db_spans.append(models.Span(**span_data, project_id=project_id))
             except Exception as e:
                 logger.error(f"Error processing span data: {span_data}", exc_info=True)
-                # Optionally, decide if you want to skip this span or fail the whole batch
+                # optionally, skip span or fail batch
                 continue
 
         if not db_spans:
@@ -55,10 +55,10 @@ class PostgresTraceRepository(TraceRepository):
         self, project_id: uuid.UUID, limit: int = 100
     ) -> List[models.Span]:
         """
-        Retrieves the most recent traces for a given project ID.
-        This is a multi-step query to avoid ambiguity in DISTINCT + ORDER BY.
+        retrieves recent traces for a project id.
+        multi-step query to avoid ambiguity.
         """
-        # Step 1: Find the latest start_time for each trace_id
+        # step 1: find latest start_time for each trace_id
         latest_spans_subquery = (
             self.db.query(
                 models.Span.trace_id,
@@ -69,7 +69,7 @@ class PostgresTraceRepository(TraceRepository):
             .subquery()
         )
 
-        # Step 2: Get the top N trace_ids ordered by that latest start_time
+        # step 2: get top n trace_ids by latest start_time
         recent_trace_ids_query = (
             self.db.query(latest_spans_subquery.c.trace_id)
             .order_by(latest_spans_subquery.c.latest_start_time.desc())
@@ -81,7 +81,7 @@ class PostgresTraceRepository(TraceRepository):
         if not recent_trace_ids:
             return []
 
-        # Step 3: Fetch all spans belonging to those trace_ids
+        # step 3: fetch all spans for those trace_ids
         return (
             self.db.query(models.Span)
             .filter(models.Span.trace_id.in_(recent_trace_ids))
@@ -125,8 +125,8 @@ class PostgresTraceRepository(TraceRepository):
     ) -> models.Project:
         import secrets
 
-        # TODO: Implement actual encryption for the SSH key before storing it.
-        # For now, it's stored in plaintext which is NOT secure.
+        # todo: encrypt ssh key before storing.
+        # currently stored in plaintext, not secure.
         project = models.Project(
             id=uuid.uuid4(),
             name=name,
@@ -141,10 +141,10 @@ class PostgresTraceRepository(TraceRepository):
         return project
 
     def delete_project(self, project_id: uuid.UUID) -> int:
-        # First, delete all traces for the project
+        # first, delete all traces for the project
         self.delete_traces_by_project_id(project_id)
 
-        # Then, delete the project itself
+        # then, delete the project itself
         project = (
             self.db.query(models.Project)
             .filter(models.Project.id == project_id)
@@ -158,7 +158,7 @@ class PostgresTraceRepository(TraceRepository):
         return 1
 
     def delete_all_data(self) -> int:
-        """Drops all tables from the database."""
+        """drops all tables from database."""
         try:
             Base.metadata.drop_all(bind=engine)
             Base.metadata.create_all(bind=engine)
@@ -168,10 +168,10 @@ class PostgresTraceRepository(TraceRepository):
             return -1
 
     def execute_sql(self, query: str, params: dict = None) -> List[Dict[str, Any]]:
-        """Executes a read-only SQL query and returns the results as a list of dicts."""
+        """executes read-only sql query, returns list of dicts."""
         try:
             result = self.db.execute(text(query), params)
-            # The .mappings().all() method returns a list of dictionary-like objects
+            # .mappings().all() returns list of dictionary-like objects
             return [row for row in result.mappings().all()]
         except Exception as e:
             logger.error(

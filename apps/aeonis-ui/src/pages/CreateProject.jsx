@@ -75,7 +75,7 @@ function CreateProject() {
               />
             </div>
 
-            {/* Private Repo Accordion */}
+            {/* private repo accordion */}
             <div className="bg-gray-700 rounded-lg p-4 mb-8">
                 <div className="flex items-center">
                     <input

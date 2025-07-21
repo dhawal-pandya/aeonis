@@ -4,7 +4,7 @@ import shutil
 from functools import lru_cache
 from ..db.repository import TraceRepository
 
-# This would be loaded from config in a real app
+# loaded from config in a real app
 REPO_CACHE_DIR = "/tmp/aeonis_repos"
 
 import git
@@ -14,15 +14,15 @@ import tempfile
 from functools import lru_cache
 from ..db.repository import TraceRepository
 
-# This would be loaded from config in a real app
+# loaded from config in a real app
 REPO_CACHE_DIR = "/tmp/aeonis_repos"
 
-@lru_cache(maxsize=32) # Cache up to 32 repositories
+@lru_cache(maxsize=32) # cache up to 32 repositories
 def get_repo(project_id: str, repo: TraceRepository):
     """
-    Returns a cached git.Repo object for a given project_id.
-    Clones the repo if it's not already cached.
-    Handles both public and private repositories (via SSH key).
+    returns a cached git.repo object for a project_id.
+    clones if not cached.
+    handles public and private repos.
     """
     project = repo.get_project_by_id(project_id)
     if not project or not project.git_repo_url:
@@ -30,11 +30,11 @@ def get_repo(project_id: str, repo: TraceRepository):
 
     repo_dir = os.path.join(REPO_CACHE_DIR, str(project.id))
 
-    # If repo is already cached, pull latest changes
+    # if repo cached, pull latest changes
     if os.path.exists(repo_dir):
         try:
             git_repo = git.Repo(repo_dir)
-            # For private repos, we need to set up the SSH environment for pulling too
+            # for private repos, set up ssh environment for pulling
             if project.is_private and project.git_ssh_key:
                 with tempfile.NamedTemporaryFile(delete=False, mode='w') as tmp:
                     tmp.write(project.git_ssh_key)
@@ -44,7 +44,7 @@ def get_repo(project_id: str, repo: TraceRepository):
                 with git_repo.git.custom_environment(GIT_SSH_COMMAND=ssh_cmd):
                     git_repo.remotes.origin.pull()
                 
-                os.unlink(ssh_key_path) # Clean up the key
+                os.unlink(ssh_key_path) # clean up key
             else:
                  git_repo.remotes.origin.pull()
 
@@ -52,44 +52,44 @@ def get_repo(project_id: str, repo: TraceRepository):
         except git.exc.InvalidGitRepositoryError:
             shutil.rmtree(repo_dir) # clean up corrupted repo
         except git.exc.GitCommandError as e:
-            # Could be an auth error, let's try re-cloning
+            # could be auth error, try re-cloning
             print(f"Error pulling repo for project {project_id}, will try re-cloning: {e}")
             shutil.rmtree(repo_dir)
 
 
-    # If not cached, clone it
+    # if not cached, clone it
     try:
         if project.is_private and project.git_ssh_key:
-            # Create a temporary file for the SSH key
+            # create temporary file for ssh key
             with tempfile.NamedTemporaryFile(delete=False, mode='w') as tmp:
                 tmp.write(project.git_ssh_key)
                 ssh_key_path = tmp.name
             
-            # Set up the SSH command to use the key
+            # set up ssh command to use key
             ssh_cmd = f"ssh -i {ssh_key_path} -o StrictHostKeyChecking=no"
             
-            # Clone with the custom SSH environment
+            # clone with custom ssh environment
             git.Repo.clone_from(
                 project.git_repo_url, 
                 repo_dir, 
                 env={"GIT_SSH_COMMAND": ssh_cmd}
             )
             
-            # IMPORTANT: Clean up the temporary key file
+            # important: clean up temporary key file
             os.unlink(ssh_key_path)
             
             return git.Repo(repo_dir)
         else:
-            # Public repo, clone normally
+            # public repo, clone normally
             git_repo = git.Repo.clone_from(project.git_repo_url, repo_dir)
             return git_repo
 
     except git.exc.GitCommandError as e:
         print(f"Error cloning repo for project {project_id}: {e}")
-        # Clean up a failed clone attempt
+        # clean up failed clone attempt
         if os.path.exists(repo_dir):
             shutil.rmtree(repo_dir)
-        # Also clean up the key if it exists
+        # also clean up key if it exists
         if 'ssh_key_path' in locals() and os.path.exists(ssh_key_path):
             os.unlink(ssh_key_path)
         return None
@@ -97,7 +97,7 @@ def get_repo(project_id: str, repo: TraceRepository):
 
 
 def list_branches(project_id: str, repo: TraceRepository):
-    """Lists all branches in the repository."""
+    """lists all branches in repository."""
     git_repo = get_repo(project_id, repo)
     if not git_repo:
         return {"error": "Git repository not found for this project."}
@@ -106,7 +106,7 @@ def list_branches(project_id: str, repo: TraceRepository):
 
 def get_commit_history(project_id: str, repo: TraceRepository, branch: str, limit: int = 10):
     """
-    Returns the commit history for a given branch.
+    returns commit history for a given branch.
     """
     git_repo = get_repo(project_id, repo)
     if not git_repo:
@@ -128,7 +128,7 @@ def get_commit_history(project_id: str, repo: TraceRepository, branch: str, limi
 
 def get_commit_diff(project_id: str, repo: TraceRepository, commit_hash: str):
     """
-    Returns the diff for a specific commit.
+    returns diff for a specific commit.
     """
     git_repo = get_repo(project_id, repo)
     if not git_repo:
@@ -136,12 +136,12 @@ def get_commit_diff(project_id: str, repo: TraceRepository, commit_hash: str):
 
     try:
         commit = git_repo.commit(commit_hash)
-        # The diff is against the first parent of the commit
+        # diff is against first parent of commit
         diffs = commit.diff(commit.parents[0])
         diff_text = "\n".join([str(d) for d in diffs])
         return {"hash": commit_hash, "diff": diff_text}
     except (git.exc.BadName, IndexError) as e:
-        # Handle case for initial commit (no parents) or invalid hash
+        # handle case for initial commit or invalid hash
         if not commit.parents:
             diffs = commit.diff(None)
             diff_text = "\n".join([str(d) for d in diffs])
@@ -150,7 +150,7 @@ def get_commit_diff(project_id: str, repo: TraceRepository, commit_hash: str):
 
 def read_file_at_commit(project_id: str, repo: TraceRepository, file_path: str, commit_hash: str):
     """
-    Reads the content of a file at a specific commit.
+    reads content of a file at a specific commit.
     """
     git_repo = get_repo(project_id, repo)
     if not git_repo:
