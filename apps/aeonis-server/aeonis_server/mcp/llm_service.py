@@ -68,30 +68,40 @@ def generate_chat_response(user_query: str, project_id: str, repo: TraceReposito
             elif tool_name == "list_branches":
                 tool_output_content = git_tools.list_branches(project_id, repo)
             elif tool_name == "get_commit_history":
-                tool_output_content = git_tools.get_commit_history(project_id, repo, **tool_args)
+                # if model doesnt provide a branch, use the first one found.
+                if "branch" not in tool_args or not tool_args["branch"]:
+                    branches = git_tools.list_branches(project_id, repo)
+                    if branches and not isinstance(branches, dict):
+                        tool_args["branch"] = branches[0] # use first branch as default
+                    else:
+                        tool_output_content = json.dumps({"error": "Could not determine the default branch."})
+                
+                if "branch" in tool_args:
+                    tool_output_content = git_tools.get_commit_history(project_id, repo, **tool_args)
+
             elif tool_name == "get_commit_diff":
                 tool_output_content = git_tools.get_commit_diff(project_id, repo, **tool_args)
             elif tool_name == "read_file_at_commit":
                 tool_output_content = git_tools.read_file_at_commit(project_id, repo, **tool_args)
             elif tool_name == "analyze_code_with_semgrep":
-                # if model doesnt provide a commit hash, use the latest one.
+                # if model doesnt provide a commit hash, use the latest one from the default branch.
                 if "commit_hash" not in tool_args or not tool_args["commit_hash"]:
-                    # first, get the default branch
                     branches = git_tools.list_branches(project_id, repo)
-                    default_branch = "main" if "main" in branches else "master"
-                    
-                    # then, get the latest commit from that branch
-                    history = git_tools.get_commit_history(project_id, repo, branch=default_branch, limit=1)
-                    if history and not isinstance(history, dict): # check for non-error response
-                        latest_commit_hash = history[0].get("hash")
-                        if latest_commit_hash:
-                            tool_args["commit_hash"] = latest_commit_hash
+                    if branches and not isinstance(branches, dict):
+                        default_branch = branches[0]
+                        history = git_tools.get_commit_history(project_id, repo, branch=default_branch, limit=1)
+                        if history and not isinstance(history, dict):
+                            latest_commit_hash = history[0].get("hash")
+                            if latest_commit_hash:
+                                tool_args["commit_hash"] = latest_commit_hash
+                            else:
+                                tool_output_content = json.dumps({"error": "Could not determine the latest commit hash."})
                         else:
-                             tool_output_content = json.dumps({"error": "Could not determine the latest commit hash."})
+                            tool_output_content = json.dumps({"error": "Could not retrieve commit history to find the latest commit."})
                     else:
-                        tool_output_content = json.dumps({"error": "Could not retrieve commit history to find the latest commit."})
+                        tool_output_content = json.dumps({"error": "Could not determine the default branch for analysis."})
 
-                if "commit_hash" in tool_args:
+                if "commit_hash" in tool_args and not tool_output_content:
                     tool_output_content = git_tools.analyze_code_with_semgrep(project_id, repo, **tool_args)
             else:
                 tool_output_content = json.dumps({"error": f"Unknown tool: {tool_name}"})
