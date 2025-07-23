@@ -116,15 +116,33 @@ Run each command in a separate terminal window.
 
 #### Step 1: Start the Aeonis Server (Backend)
 
+This command starts the Python-based backend server. It's crucial to run it from the correct directory to ensure all modules are found.
+
+**Command Breakdown:**
+
 ```bash
+# 1. Navigate to the server's directory
 cd apps/aeonis-server
+
+# 2. Activate the Python virtual environment
 source .venv/bin/activate
+
+# 3. Start the Uvicorn server
 uvicorn aeonis_server.main:app --reload --port 8000
 ```
 
+*   **`cd apps/aeonis-server`**: This is a critical first step. It changes your terminal's current directory to the root of the `aeonis-server` application. Running the server from here ensures that Python can correctly locate the `aeonis_server` module.
+*   **`source .venv/bin/activate`**: This command activates the project's dedicated Python virtual environment. This is important because it makes sure you are using the correct versions of all dependencies (like FastAPI, Uvicorn, etc.) and places the `uvicorn` executable in your `PATH`.
+*   **`uvicorn aeonis_server.main:app ...`**: This is the core command that runs the server.
+    *   `uvicorn`: The name of the high-performance ASGI server we use to run our FastAPI application.
+    *   `aeonis_server.main:app`: This tells Uvicorn where to find the application instance. It means: "Within the `aeonis_server` package, look in the `main.py` file for a variable named `app`."
+    *   `--reload`: This is a development-friendly flag. It tells Uvicorn to automatically restart the server whenever it detects a change in the source code.
+    *   `--port 8000`: This specifies that the server should listen for incoming requests on port 8000.
+
 > **Troubleshooting:**
-> *   **`uvicorn: command not found`**: Make sure you have activated the Python virtual environment with `source .venv/bin/activate`.
-> *   **`Address already in use`**: Another process is using port 8000. Find it with `lsof -ti:8000` and stop it with `kill <PID>`.
+> *   **`uvicorn: command not found`**: This means the `uvicorn` executable is not in your shell's `PATH`. **Solution:** You have likely forgotten to activate the virtual environment. Run `source .venv/bin/activate` and try again.
+> *   **`Address already in use`**: This error means another program is already using port 8000. **Solution:** Find the conflicting process with `lsof -ti:8000` and stop it with `kill <PID>`, where `<PID>` is the number returned by the first command.
+> *   **Server returns `Internal Server Error`**: If the server starts but API calls fail with a 500 error, it indicates a bug in the application code. **Solution:** Check the terminal window where the server is running. FastAPI will print a detailed traceback of the error. If you are running the server in the background, check the contents of the `apps/aeonis-server/uvicorn.log` file to find the traceback. This was key to debugging the `MALFORMED_FUNCTION_CALL` error.
 
 #### Step 2: Start the Invoxa Test App (Go Service)
 

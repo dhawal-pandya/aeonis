@@ -76,3 +76,4 @@ INFO:     Finished server process [87929]
 INFO:     Started server process [88190]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+INFO:     127.0.0.1:53986 - "POST /v1/projects/7a5e8c56-d065-4780-9ad9-5186127fa4fc/chat HTTP/1.1" 200 OK
