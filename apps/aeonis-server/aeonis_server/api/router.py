@@ -43,7 +43,7 @@ async def project_chat(
         raise HTTPException(status_code=400, detail="Message is required.")
 
     # llm_service handles chat flow with all tools
-    response_text = llm_service.chat_with_db(
+    response_text = llm_service.generate_chat_response(
         user_query=user_query,
         project_id=str(project_id),
         repo=repo,

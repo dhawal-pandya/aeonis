@@ -53,7 +53,7 @@ class PostgresTraceRepository(TraceRepository):
 
     def get_traces_by_project_id(
         self, project_id: uuid.UUID, limit: int = 100
-    ) -> List[models.Span]:
+    ) -> List[Dict[str, Any]]:
         """
         retrieves recent traces for a project id.
         multi-step query to avoid ambiguity.
@@ -82,12 +82,13 @@ class PostgresTraceRepository(TraceRepository):
             return []
 
         # step 3: fetch all spans for those trace_ids
-        return (
+        spans = (
             self.db.query(models.Span)
             .filter(models.Span.trace_id.in_(recent_trace_ids))
             .order_by(models.Span.start_time.asc())
             .all()
         )
+        return [span.to_dict() for span in spans]
 
     def delete_traces_by_project_id(self, project_id: uuid.UUID) -> int:
         num_deleted = (
@@ -98,13 +99,14 @@ class PostgresTraceRepository(TraceRepository):
         self.db.commit()
         return num_deleted
 
-    def get_spans_by_trace_id(self, trace_id: str) -> List[models.Span]:
-        return (
+    def get_spans_by_trace_id(self, trace_id: str) -> List[Dict[str, Any]]:
+        spans = (
             self.db.query(models.Span)
             .filter(models.Span.trace_id == trace_id)
             .order_by(models.Span.start_time.asc())
             .all()
         )
+        return [span.to_dict() for span in spans]
 
     def get_project_by_id(self, project_id: uuid.UUID) -> models.Project:
         return (
@@ -113,8 +115,9 @@ class PostgresTraceRepository(TraceRepository):
             .first()
         )
 
-    def get_all_projects(self) -> List[models.Project]:
-        return self.db.query(models.Project).all()
+    def get_all_projects(self) -> List[Dict[str, Any]]:
+        projects = self.db.query(models.Project).all()
+        return [project.to_dict() for project in projects]
 
     def create_project(
         self,

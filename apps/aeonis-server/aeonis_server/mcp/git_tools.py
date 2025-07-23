@@ -162,3 +162,51 @@ def read_file_at_commit(project_id: str, repo: TraceRepository, file_path: str, 
         return {"file_content": blob.data_stream.read().decode("utf-8")}
     except (KeyError, git.exc.BadName) as e:
         return {"error": f"Could not read file '{file_path}' at commit '{commit_hash}'. Details: {e}"}
+
+import subprocess
+import json
+
+def analyze_code_with_semgrep(project_id: str, repo: TraceRepository, commit_hash: str):
+    """
+    runs semgrep on the repository at a specific commit and returns the findings.
+    """
+    git_repo = get_repo(project_id, repo)
+    if not git_repo:
+        return {"error": "Git repository not found for this project."}
+
+    repo_dir = os.path.join(REPO_CACHE_DIR, str(project_id))
+
+    try:
+        # checkout the specific commit
+        git_repo.git.checkout(commit_hash, force=True)
+
+        # run semgrep scan
+        # using a general-purpose configuration
+        config = "p/default" 
+        result = subprocess.run(
+            ["semgrep", "scan", "--json", "--config", config],
+            cwd=repo_dir,
+            capture_output=True,
+            text=True,
+        )
+
+        # checkout back to the main branch (or default)
+        # assuming 'main' or 'master'
+        try:
+            git_repo.git.checkout('main', force=True)
+        except git.exc.GitCommandError:
+            git_repo.git.checkout('master', force=True)
+
+
+        if result.returncode >= 2: # semgrep returns >= 2 for critical errors
+            return {"error": "Semgrep scan failed.", "details": result.stderr}
+
+        findings = json.loads(result.stdout)
+        return {"findings": findings["results"]}
+
+    except git.exc.GitCommandError as e:
+        return {"error": f"Could not checkout commit '{commit_hash}'. Details: {e}"}
+    except json.JSONDecodeError:
+        return {"error": "Failed to parse Semgrep JSON output."}
+    except Exception as e:
+        return {"error": f"An unexpected error occurred: {e}"}

@@ -60,6 +60,18 @@ READ_FILE_AT_COMMIT = FunctionDeclaration(
     },
 )
 
+ANALYZE_CODE_WITH_SEMGREP = FunctionDeclaration(
+    name="analyze_code_with_semgrep",
+    description="Runs a static analysis scan on the code at a specific commit hash and returns a list of findings.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "commit_hash": {"type": "string", "description": "The commit hash to analyze the code at."},
+        },
+        "required": ["commit_hash"],
+    },
+)
+
 
 # --- Tool Definitions ---
 DB_TOOLS = Tool(
@@ -74,6 +86,7 @@ GIT_TOOLS = Tool(
         GET_COMMIT_HISTORY,
         GET_COMMIT_DIFF,
         READ_FILE_AT_COMMIT,
+        ANALYZE_CODE_WITH_SEMGREP,
     ]
 )
 

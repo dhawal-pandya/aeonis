@@ -17,7 +17,7 @@ if not API_KEY:
 genai.configure(api_key=API_KEY)
 
 
-def chat_with_db(user_query: str, project_id: str, repo: TraceRepository, tools: list):
+def generate_chat_response(user_query: str, project_id: str, repo: TraceRepository, tools: list):
     """handles chat interaction with tool calls and responses."""
     system_instruction = f"{SYSTEM_PROMPT}\n\n**Current Project Context:** You are currently operating on `project_id`: `{project_id}`."
 
@@ -34,7 +34,12 @@ def chat_with_db(user_query: str, project_id: str, repo: TraceRepository, tools:
     )
 
     while True:
-        part = response.candidates[0].content.parts[0]
+        if not response.candidates:
+            return "An unexpected error occurred: No candidates in response."
+        
+        part = response.candidates[0].content.parts[0] if response.candidates[0].content.parts else None
+        if not part:
+            return "An unexpected error occurred: No parts in response."
 
         if hasattr(part, "function_call") and part.function_call:
             tool_call = part.function_call
@@ -68,6 +73,26 @@ def chat_with_db(user_query: str, project_id: str, repo: TraceRepository, tools:
                 tool_output_content = git_tools.get_commit_diff(project_id, repo, **tool_args)
             elif tool_name == "read_file_at_commit":
                 tool_output_content = git_tools.read_file_at_commit(project_id, repo, **tool_args)
+            elif tool_name == "analyze_code_with_semgrep":
+                # if model doesnt provide a commit hash, use the latest one.
+                if "commit_hash" not in tool_args or not tool_args["commit_hash"]:
+                    # first, get the default branch
+                    branches = git_tools.list_branches(project_id, repo)
+                    default_branch = "main" if "main" in branches else "master"
+                    
+                    # then, get the latest commit from that branch
+                    history = git_tools.get_commit_history(project_id, repo, branch=default_branch, limit=1)
+                    if history and not isinstance(history, dict): # check for non-error response
+                        latest_commit_hash = history[0].get("hash")
+                        if latest_commit_hash:
+                            tool_args["commit_hash"] = latest_commit_hash
+                        else:
+                             tool_output_content = json.dumps({"error": "Could not determine the latest commit hash."})
+                    else:
+                        tool_output_content = json.dumps({"error": "Could not retrieve commit history to find the latest commit."})
+
+                if "commit_hash" in tool_args:
+                    tool_output_content = git_tools.analyze_code_with_semgrep(project_id, repo, **tool_args)
             else:
                 tool_output_content = json.dumps({"error": f"Unknown tool: {tool_name}"})
 
@@ -81,6 +106,5 @@ def chat_with_db(user_query: str, project_id: str, repo: TraceRepository, tools:
                 protos.Part(function_response=tool_output)
             )
         else:
-            # if no tool call, return direct text response
             return response.text
 
