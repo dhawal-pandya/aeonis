@@ -1,4 +1,4 @@
-#### Step 1: Start the Aeonis Server (Backend)
+## Step 1: Start the Aeonis Server (Backend)
 
 This command starts the Python-based backend server. It's crucial to run it from the correct directory to ensure all modules are found.
 
@@ -51,7 +51,48 @@ curl -X POST http://localhost:8000/v1/debug/clear-database
 ```
 
 
-#### Step 2: Start the Invoxa Test App (Go Service)
+**Note:** You will need to capture the `ID` from the response of one command and use it in the subsequent commands.
+
+## Step 2: Onboard New Project
+
+
+```bash
+curl -X POST http://localhost:8000/v1/projects \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Invoxa Test Project",
+  "git_repo_url": "https://github.com/dhawal-pandya/invoxa-test.git"
+}'
+```
+
+**Response Example:**
+```json
+{
+    "api_key": "eD_FJfw-A_6yCyih8HTaJChPFJroKcx2U2r3ghMumXA",
+    "name": "Invoxa Test Project",
+    "is_private": false,
+    "git_repo_url": "https://github.com/dhawal-pandya/invoxa-test.git",
+    "id": "47dfe55d-6c00-40d8-b03d-51123acfdd8a",
+    "git_ssh_key": null
+}
+```
+> **Action:** Create a new project in Aeonis. **Save the `id` and `api_key` from the response.**
+
+
+## Step 3: Start the Invoxa Test App (Go Service)
+
+### Set Environment Variables
+
+Before running your application, you must set the following environment variables:
+
+```bash
+# The API key you saved from step 2
+export AEONIS_API_KEY="your-api-key-goes-here"
+export AEONIS_API_KEY="eD_FJfw-A_6yCyih8HTaJChPFJroKcx2U2r3ghMumXA"
+
+# The current Git commit hash of your application
+export AEONIS_COMMIT_ID=$(git rev-parse HEAD)
+```
 
 ```bash
 cd invoxa-test
@@ -75,48 +116,46 @@ curl http://127.0.0.1:8081/ping
 curl -X POST http://localhost:8081/admin/clear_db
 ```
 
-**Note:** You will need to capture the `ID` from the response of one command and use it in the subsequent commands.
+## Step 4: Create a New organisation
 
-#### Step 3: Onboard New Project
-
+Now, create a new organization
 
 ```bash
-curl -X POST http://localhost:8000/v1/projects \
--H "Content-Type: application/json" \
--d '{
-  "name": "Invoxa Test Project",
-  "git_repo_url": "https://github.com/dhawal-pandya/invoxa-test.git"
-}'
+curl -X POST http://localhost:8081/organizations \
+    -H "Content-Type: application/json" \
+    -d '{
+      "name": "My Awesome Company",
+      "billing_email": "billing@example.com"
+    }'
 ```
-
 **Response Example:**
 ```json
 {
-    "api_key": "6TrrqD00l8Yy1m3aIofmvmHWNY6zm67h0oSqXKeAVjM",
-    "name": "Invoxa Test Project",
-    "is_private": false,
-    "git_repo_url": "https://github.com/dhawal-pandya/invoxa-test.git",
-    "id": "9a7aa980-c545-46fd-87d7-55d005f0c568",
-    "git_ssh_key": null
-}
+    "ID": 1,
+    "CreatedAt": "2025-07-31T20:08:47.291785+05:30",
+    "UpdatedAt": "2025-07-31T20:08:47.291785+05:30",
+    "DeletedAt": null,
+    "Name": "My Awesome Company",
+    "BillingEmail": "billing@example.com",
+    "Users": null,
+    "Subscriptions": null,
+    "SubscriptionPlans": null,
+    "Invoices": null
+} 
 ```
-> **Action:** Create a new project in Aeonis. **Save the `id` and `api_key` from the response.**
 
-#### Step 4: Create a New User
+## Step 5: Create a New User
 
 Now, create a user associated with the organization you just created.
 
 ```bash
-# Replace <ORG_ID> with the ID from Step 1
-ORG_ID=1
-
 curl -X POST http://localhost:8081/users \
 -H "Content-Type: application/json" \
 -d '{
   "username": "testuser",
   "email": "test@innovate.com",
   "password": "securepassword123",
-  "organization_id": '$ORG_ID'
+  "organization_id": '1'
 }'
 ```
 **Response Example:**
@@ -125,16 +164,13 @@ curl -X POST http://localhost:8081/users \
 ```
 > **Action:** Copy the `user_id` (e.g., `1`). This is your `USER_ID`.
 
-#### Step 3: Create a Subscription Plan
+## Step 6: Create a Subscription Plan
 
 The following commands require authentication. We'll pass the `caller_organization_id` and `caller_user_id` as query parameters to simulate an authenticated session.
 
 ```bash
-# Replace <ORG_ID> with your Organization ID
-ORG_ID=1
-USER_ID=1
 
-curl -X POST "http://localhost:8081/subscription_plans?caller_organization_id=$ORG_ID&caller_user_id=$USER_ID" \
+curl -X POST "http://localhost:8081/subscription_plans?caller_organization_id=1&caller_user_id=1" \
 -H "Content-Type: application/json" \
 -d '{
     "name": "Pro Plan",
@@ -142,7 +178,7 @@ curl -X POST "http://localhost:8081/subscription_plans?caller_organization_id=$O
     "price": 99.99,
     "currency": "USD",
     "interval": "monthly",
-    "organization_id": '$ORG_ID'
+    "organization_id": '1'
 }'
 ```
 **Response Example:**
@@ -151,22 +187,17 @@ curl -X POST "http://localhost:8081/subscription_plans?caller_organization_id=$O
 ```
 > **Action:** Copy the `plan_id` (e.g., `1`). This is your `PLAN_ID`.
 
-#### Step 4: Subscribe the Organization to the Plan
+## Step 7: Subscribe the Organization to the Plan
 
 This action will create a `Subscription` and the first `Invoice`.
 
 ```bash
-# Replace with your IDs
-ORG_ID=1
-USER_ID=1
-PLAN_ID=1
-
-curl -X POST "http://localhost:8081/subscribe?caller_organization_id=$ORG_ID&caller_user_id=$USER_ID" \
+curl -X POST "http://localhost:8081/subscribe?caller_organization_id=1&caller_user_id=1" \
 -H "Content-Type: application/json" \
 -d '{
-    "organization_id": '$ORG_ID',
-    "subscription_plan_id": '$PLAN_ID',
-    "user_id": '$USER_ID'
+    "organization_id": '1',
+    "subscription_plan_id": '1',
+    "user_id": '1'
 }'
 ```
 **Response Example:**
@@ -175,21 +206,16 @@ curl -X POST "http://localhost:8081/subscribe?caller_organization_id=$ORG_ID&cal
 ```
 > **Action:** Copy the `invoice_id` (e.g., `1`). This is your `INVOICE_ID`.
 
-#### Step 5: Pay the Invoice
+## Step 8: Pay the Invoice
 
 Finally, simulate paying the invoice that was just created.
 
 ```bash
-# Replace with your IDs
-ORG_ID=1
-USER_ID=1
-INVOICE_ID=1
-
-curl -X POST "http://localhost:8081/pay_invoice?caller_organization_id=$ORG_ID&caller_user_id=$USER_ID" \
+curl -X POST "http://localhost:8081/pay_invoice?caller_organization_id=1&caller_user_id=1" \
 -H "Content-Type: application/json" \
 -d '{
-    "invoice_id": '$INVOICE_ID',
-    "user_id": '$USER_ID',
+    "invoice_id": '1',
+    "user_id": '1',
     "amount": 99.99,
     "currency": "USD",
     "transaction_id": "txn_123abc456def",
@@ -197,6 +223,6 @@ curl -X POST "http://localhost:8081/pay_invoice?caller_organization_id=$ORG_ID&c
 }'
 ```
 
-#### Step 6: View Traces
+## Step 9: View Traces
 
 After running these commands, go to the **Aeonis UI** at `http://localhost:5173`. Enter your project ID and click **Fetch Traces**. You will see new traces corresponding to each `curl` command you executed. Click on them to see the detailed waterfall view and use the AI Chat to ask questions about them.

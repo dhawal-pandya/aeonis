@@ -195,6 +195,3 @@ npm run dev
 
 > **Troubleshooting:**
 > *   **`address already in use`**: Another process is using port 5173. Find it with `lsof -ti:5173` and stop it with `kill <PID>`.
-
-
-<br>
