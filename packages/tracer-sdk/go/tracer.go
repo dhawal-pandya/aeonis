@@ -49,6 +49,21 @@ func NewTracerWithExporter(serviceName string, exporter Exporter, sanitizer Sani
 	}
 }
 
+// setapikey sets the api key for the http exporter.
+// this is useful for testing, but not recommended for production use.
+func (t *Tracer) SetAPIKey(apiKey string) {
+	if exporter, ok := t.exporter.(*HTTPExporter); ok {
+		exporter.apiKey = apiKey
+	}
+}
+
+// shutdown calls the exporter's shutdown method.
+func (t *Tracer) Shutdown() {
+	if exporter, ok := t.exporter.(interface{ Shutdown() }); ok {
+		exporter.Shutdown()
+	}
+}
+
 // startspan starts a new span.
 func (t *Tracer) StartSpan(ctx context.Context, name string) (context.Context, *Span) {
 	parentSpan, _ := fromContext(ctx)

@@ -18,6 +18,7 @@ class PostgresTraceRepository(TraceRepository):
         self.db = db
 
     def get_project_by_api_key(self, api_key: str) -> models.Project:
+        logger.info(f"Querying for project with API key: {api_key}")
         return (
             self.db.query(models.Project)
             .filter(models.Project.api_key == api_key)
@@ -25,13 +26,26 @@ class PostgresTraceRepository(TraceRepository):
         )
 
     def add_spans(self, spans: List[Dict[str, Any]], project_id: uuid.UUID):
-
+        logger.info(f"Processing {len(spans)} spans for project_id: {project_id}")
         db_spans = []
         for span_data in spans:
             try:
-                # span model maps commit_id and sdk_version
-                # while preserving attributes dictionary.
-                db_spans.append(models.Span(**span_data, project_id=project_id))
+                # manually map the span data to the span model
+                # to avoid any unexpected keyword arguments.
+                db_span = models.Span(
+                    project_id=project_id,
+                    trace_id=span_data.get("trace_id"),
+                    span_id=span_data.get("span_id"),
+                    parent_span_id=span_data.get("parent_span_id"),
+                    name=span_data.get("name"),
+                    commit_id=span_data.get("commit_id"),
+                    sdk_version=span_data.get("sdk_version"),
+                    start_time=span_data.get("start_time"),
+                    end_time=span_data.get("end_time"),
+                    attributes=span_data.get("attributes"),
+                    error=span_data.get("error"),
+                )
+                db_spans.append(db_span)
             except Exception as e:
                 logger.error(f"Error processing span data: {span_data}", exc_info=True)
                 # optionally, skip span or fail batch
@@ -42,6 +56,7 @@ class PostgresTraceRepository(TraceRepository):
             return
 
         try:
+            logger.info(f"Committing {len(db_spans)} spans to the database.")
             self.db.add_all(db_spans)
             self.db.commit()
             logger.info(

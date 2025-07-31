@@ -108,10 +108,6 @@ The `Chatbox.jsx` component provides a chat interface where you can ask question
 
 ## 4. Running the Application
 
-You can run the services individually for more control or use the provided convenience scripts to start and stop everything at once.
-
-### Method 1: Running Services Individually (Manual)
-
 Run each command in a separate terminal window.
 
 #### Step 1: Start the Aeonis Server (Backend)
@@ -120,15 +116,22 @@ This command starts the Python-based backend server. It's crucial to run it from
 
 **Command Breakdown:**
 
+For a clean test run, remove the log files from previous sessions.
+
 ```bash
-# 1. Navigate to the server's directory
+# In the project root directory
+rm -f apps/aeonis-server/uvicorn.log
+rm -f invoxa-test/invoxa.log
+```
+
+---
+
+```bash
 cd apps/aeonis-server
 
-# 2. Activate the Python virtual environment
 source .venv/bin/activate
 
-# 3. Start the Uvicorn server
-uvicorn aeonis_server.main:app --reload --port 8000
+uvicorn aeonis_server.main:app --reload --port 8000 --log-config uvicorn_log_config.json
 ```
 
 *   **`cd apps/aeonis-server`**: This is a critical first step. It changes your terminal's current directory to the root of the `aeonis-server` application. Running the server from here ensures that Python can correctly locate the `aeonis_server` module.
@@ -144,6 +147,20 @@ uvicorn aeonis_server.main:app --reload --port 8000
 > *   **`Address already in use`**: This error means another program is already using port 8000. **Solution:** Find the conflicting process with `lsof -ti:8000` and stop it with `kill <PID>`, where `<PID>` is the number returned by the first command.
 > *   **Server returns `Internal Server Error`**: If the server starts but API calls fail with a 500 error, it indicates a bug in the application code. **Solution:** Check the terminal window where the server is running. FastAPI will print a detailed traceback of the error. If you are running the server in the background, check the contents of the `apps/aeonis-server/uvicorn.log` file to find the traceback. This was key to debugging the `MALFORMED_FUNCTION_CALL` error.
 
+* **Verification**
+
+```bash
+curl http://127.0.0.1:8000/ping
+```
+
+**Expected Output:** `{"message":"pong"}`
+
+* **Run this to clear Aeonis DB**
+```bash
+curl -X POST http://localhost:8000/v1/debug/clear-database
+```
+
+
 #### Step 2: Start the Invoxa Test App (Go Service)
 
 ```bash
@@ -153,6 +170,21 @@ go run main.go
 
 > **Troubleshooting:**
 > *   **`listen tcp :8081: bind: address already in use`**: Another process is using port 8081. Find it with `lsof -ti:8081` and stop it with `kill <PID>`.
+
+
+* **Verification**
+
+```bash
+curl http://127.0.0.1:8081/ping
+```
+
+**Expected Output:** `{"message":"pong"}`
+
+* **Run this to clear Invoxa DBs**
+```bash
+curl -X POST http://localhost:8081/admin/clear_db
+```
+
 
 #### Step 3: Start the Aeonis UI (Frontend)
 
@@ -164,144 +196,5 @@ npm run dev
 > **Troubleshooting:**
 > *   **`address already in use`**: Another process is using port 5173. Find it with `lsof -ti:5173` and stop it with `kill <PID>`.
 
-### Method 2: Using the Convenience Scripts
 
-For a simpler experience, you can use the provided shell scripts in the project root to manage all services simultaneously.
-
-*   **To start all services:**
-    ```bash
-    ./start_all.sh
-    ```
-*   **To stop all services:**
-    ```bash
-    ./shutdown_all.sh
-    ```
-
----
-
-
-## 5. End-to-End Demo Flow with `curl`
-
-Here is a sequence of `curl` commands to simulate a common user flow in the `invoxa-test` application. Running these commands will generate meaningful, interconnected traces that you can explore in the Aeonis UI.
-
-**Note:** You will need to capture the `ID` from the response of one command and use it in the subsequent commands.
-
-### Step 1: Create a New Organization
-
-This command creates a new organization. Note the `ID` in the JSON response.
-
-```bash
-curl -X POST http://localhost:8081/organizations \
--H "Content-Type: application/json" \
--d '{
-  "name": "Innovate Inc.",
-  "billing_email": "billing@innovate.com"
-}'
-```
-
-**Response Example:**
-```json
-{"ID":1,"CreatedAt":"...","UpdatedAt":"...","DeletedAt":null,"name":"Innovate Inc.","billing_email":"billing@innovate.com","Users":null,"SubscriptionPlans":null,"Subscriptions":null,"Invoices":null}
-```
-> **Action:** Copy the `ID` (e.g., `1`) from the response. This is your `ORG_ID`.
-
-### Step 2: Create a New User
-
-Now, create a user associated with the organization you just created.
-
-```bash
-# Replace <ORG_ID> with the ID from Step 1
-ORG_ID=1
-
-curl -X POST http://localhost:8081/users \
--H "Content-Type: application/json" \
--d '{
-  "username": "testuser",
-  "email": "test@innovate.com",
-  "password": "securepassword123",
-  "organization_id": '$ORG_ID'
-}'
-```
-**Response Example:**
-```json
-{"message":"User created successfully","user_id":1}
-```
-> **Action:** Copy the `user_id` (e.g., `1`). This is your `USER_ID`.
-
-### Step 3: Create a Subscription Plan
-
-The following commands require authentication. We'll pass the `caller_organization_id` and `caller_user_id` as query parameters to simulate an authenticated session.
-
-```bash
-# Replace <ORG_ID> with your Organization ID
-ORG_ID=1
-USER_ID=1
-
-curl -X POST "http://localhost:8081/subscription_plans?caller_organization_id=$ORG_ID&caller_user_id=$USER_ID" \
--H "Content-Type: application/json" \
--d '{
-    "name": "Pro Plan",
-    "description": "The professional tier plan.",
-    "price": 99.99,
-    "currency": "USD",
-    "interval": "monthly",
-    "organization_id": '$ORG_ID'
-}'
-```
-**Response Example:**
-```json
-{"message":"Subscription plan created successfully","plan_id":1}
-```
-> **Action:** Copy the `plan_id` (e.g., `1`). This is your `PLAN_ID`.
-
-### Step 4: Subscribe the Organization to the Plan
-
-This action will create a `Subscription` and the first `Invoice`.
-
-```bash
-# Replace with your IDs
-ORG_ID=1
-USER_ID=1
-PLAN_ID=1
-
-curl -X POST "http://localhost:8081/subscribe?caller_organization_id=$ORG_ID&caller_user_id=$USER_ID" \
--H "Content-Type: application/json" \
--d '{
-    "organization_id": '$ORG_ID',
-    "subscription_plan_id": '$PLAN_ID',
-    "user_id": '$USER_ID'
-}'
-```
-**Response Example:**
-```json
-{"message":"Subscription and initial invoice created successfully","subscription_id":1,"invoice_id":1}
-```
-> **Action:** Copy the `invoice_id` (e.g., `1`). This is your `INVOICE_ID`.
-
-### Step 5: Pay the Invoice
-
-Finally, simulate paying the invoice that was just created.
-
-```bash
-# Replace with your IDs
-ORG_ID=1
-USER_ID=1
-INVOICE_ID=1
-
-curl -X POST "http://localhost:8081/pay_invoice?caller_organization_id=$ORG_ID&caller_user_id=$USER_ID" \
--H "Content-Type: application/json" \
--d '{
-    "invoice_id": '$INVOICE_ID',
-    "user_id": '$USER_ID',
-    "amount": 99.99,
-    "currency": "USD",
-    "transaction_id": "txn_123abc456def",
-    "payment_method": "credit_card"
-}'
-```
-
-### Step 6: View Traces
-
-After running these commands, go to the **Aeonis UI** at `http://localhost:5173`. Enter your project ID and click **Fetch Traces**. You will see new traces corresponding to each `curl` command you executed. Click on them to see the detailed waterfall view and use the AI Chat to ask questions about them.
-
-```
+<br>

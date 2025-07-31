@@ -32,68 +32,35 @@ This project is a monorepo containing the `aeonis-server` and `aeonis-ui`. The f
 
 This project is a monorepo containing the server and UI. The following instructions will guide you through setting up the full local development environment.
 
-### Step 1: Set up the Aeonis Server
-
-The server is the core of the platform. It must be running for the UI to function.
+### How to set up the Aeonis Server
 
 **For detailed instructions, refer to the server's README:**
-[`/apps/aeonis-server/README.md`](./apps/aeonis-server/README.md)
+[`Aeonis-Server`](./apps/aeonis-server/README.md)
 
-**Quick Setup:**
-
-1.  **Setup PostgreSQL:** Create a database named `aeonisdb`.
-    ```sql
-    -- In psql
-    CREATE DATABASE aeonisdb;
-    ```
-2.  **Configure Environment:** Create an `.env` file in `/apps/aeonis-server/` with your `GEMINI_API_KEY` and `DATABASE_URL`.
-3.  **Install & Run:**
-    ```bash
-    # Navigate to the server directory
-    cd apps/aeonis-server
-
-    # Create and activate a Python virtual environment
-    python3 -m venv .venv
-    source .venv/bin/activate
-
-    # Install dependencies
-    pip install -r requirements.txt
-
-    # Initialize the database schema (run once)
-    python3 init_db_script.py
-
-    # Run the server
-    uvicorn aeonis_server.main:app --host 127.0.0.1 --port 8000
-    ```
-
-### Step 2: Set up the Aeonis UI
+### How to set up the Aeonis UI
 
 The UI is the web interface for interacting with the platform.
 
 **For detailed instructions, refer to the UI's README:**
-[`/apps/aeonis-ui/README.md`](./apps/aeonis-ui/README.md)
+[`Aeonis-UI`](./apps/aeonis-ui/README.md)
 
-**Quick Setup:**
-
-1.  **Navigate to the UI directory:**
-    ```bash
-    cd apps/aeonis-ui
-    ```
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-3.  **Run the development server:**
-    ```bash
-    npm run dev
-    ```
-
-### Step 3: Use the Application
+### How to use the Application
 
 -   The **Aeonis Server** will be running at `http://127.0.0.1:8000`.
 -   The **Aeonis UI** will be available at `http://localhost:5173`.
 
 Open the UI in your browser to start exploring. You will need a Project ID to fetch traces and use the chat. You can create a project and get an API key by calling the server's API.
 
----
-*This README reflects the project status as of Friday, July 18, 2025.*
+### How to onboard a project to Aeonis
+
+You can use the UI to onboard a new project to Aeonis, 
+
+**For detailed instructions, refer to the Onboarding Guide:**
+[`Onboarding`](./docs/onboarding.md)
+
+### Guide for developers to tinker about the project
+
+You can use curls and run the project locally without issues, you will need a test project, I recommend [`Invoxa`](https://github.com/dhawal-pandya/Invoxa)
+
+**For detailed instructions, refer to the Developers Guide:**
+[`Developers guide`](./docs/for_developers.md.md)

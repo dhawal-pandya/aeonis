@@ -149,4 +149,11 @@ def generate_chat_response(
 
             response = chat.send_message(protos.Part(function_response=tool_output))
         else:
-            return response.text
+            # if the part is not a function call, it should be text.
+            # add a check for robustness.
+            if hasattr(part, "text") and part.text:
+                return part.text
+            else:
+                # if it's not text and not a function call, we don't know how to handle it.
+                logger.error(f"Unhandled response part type: {type(part)}")
+                return "I received a response I don't know how to handle. Please try again."

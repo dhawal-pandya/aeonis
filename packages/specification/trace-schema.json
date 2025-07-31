@@ -4,11 +4,6 @@
   "description": "A single unit of work in an Aeonis trace.",
   "type": "object",
   "properties": {
-    "project_id": {
-      "type": "string",
-      "format": "uuid",
-      "description": "The ID of the project this span belongs to."
-    },
     "trace_id": {
       "type": "string",
       "format": "uuid"
@@ -65,7 +60,6 @@
     }
   },
   "required": [
-    "project_id",
     "trace_id",
     "span_id",
     "name",

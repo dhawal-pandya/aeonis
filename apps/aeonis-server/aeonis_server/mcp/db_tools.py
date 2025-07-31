@@ -1,10 +1,23 @@
 import json
-from typing import List
 import uuid
+import datetime
 from ..db.repository import TraceRepository
 
 # this file contains functions for the llm to use.
 # each function needs a clear purpose and type hints.
+
+
+class CustomJsonEncoder(json.JSONEncoder):
+    """custom json encoder to handle uuid and datetime objects."""
+
+    def default(self, obj):
+        if isinstance(obj, uuid.UUID):
+            # if the obj is uuid, we return the uuid as a string
+            return str(obj)
+        if isinstance(obj, datetime.datetime):
+            # if the obj is datetime, we return the datetime as a string
+            return obj.isoformat()
+        return super().default(obj)
 
 
 def execute_sql_query(repo: TraceRepository, query: str, params: dict = None) -> str:
@@ -23,6 +36,6 @@ def execute_sql_query(repo: TraceRepository, query: str, params: dict = None) ->
         result = repo.execute_sql(query, params)
         # convert list of rowmapping objects to list of dicts
         result_dicts = [dict(row) for row in result]
-        return json.dumps(result_dicts)
+        return json.dumps(result_dicts, cls=CustomJsonEncoder)
     except Exception as e:
         return json.dumps({"error": str(e)})

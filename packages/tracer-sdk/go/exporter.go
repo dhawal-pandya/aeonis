@@ -74,6 +74,16 @@ func (e *HTTPExporter) Export(span *Span) {
 	e.spanChannel <- span
 }
 
+// shutdown flushes any remaining spans in the channel.
+func (e *HTTPExporter) Shutdown() {
+	// a simple sleep is not a robust solution, but for this example,
+	// it's the easiest way to ensure spans are sent before exit.
+	// a more robust solution would use a waitgroup or a channel to signal
+	// that the batch processor has finished.
+	time.Sleep(6 * time.Second) // wait for the batch processor to send
+	close(e.spanChannel)
+}
+
 func (e *HTTPExporter) startBatchProcessor() {
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
@@ -81,7 +91,14 @@ func (e *HTTPExporter) startBatchProcessor() {
 	var batch []*Span
 	for {
 		select {
-		case span := <-e.spanChannel:
+		case span, ok := <-e.spanChannel:
+			if !ok {
+				// channel is closed, send remaining batch and exit
+				if len(batch) > 0 {
+					e.sendBatch(batch)
+				}
+				return
+			}
 			batch = append(batch, span)
 			if len(batch) >= 50 {
 				e.sendBatch(batch)
@@ -110,6 +127,7 @@ func (e *HTTPExporter) sendBatch(batch []*Span) {
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("X-Aeonis-API-Key", e.apiKey)
+	log.Printf("[Aeonis SDK] Sending traces with API Key: %s", e.apiKey) // Verification log
 
 	resp, err := e.client.Do(req)
 	if err != nil {

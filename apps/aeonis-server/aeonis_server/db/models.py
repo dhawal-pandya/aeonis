@@ -15,13 +15,16 @@ class Project(Base):
 
     spans = relationship("Span", back_populates="project")
 
-    def to_dict(self):
-        return {
+    def to_dict(self, include_api_key: bool = False):
+        data = {
             "id": str(self.id),
             "name": self.name,
             "git_repo_url": self.git_repo_url,
             "is_private": self.is_private,
         }
+        if include_api_key:
+            data["api_key"] = self.api_key
+        return data
 
 class Span(Base):
     __tablename__ = "spans"
