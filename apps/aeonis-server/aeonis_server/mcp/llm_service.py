@@ -39,121 +39,99 @@ def generate_chat_response(
         if not response.candidates:
             return "An unexpected error occurred: No candidates in response."
 
-        part = (
-            response.candidates[0].content.parts[0]
-            if response.candidates[0].content.parts
-            else None
-        )
-        if not part:
-            return "An unexpected error occurred: No parts in response."
+        # initialize a list to hold all tool outputs for this turn
+        tool_outputs = []
 
-        if hasattr(part, "function_call") and part.function_call:
-            tool_call = part.function_call
-            tool_name = tool_call.name
-            tool_args = dict(tool_call.args)
+        for part in response.candidates[0].content.parts:
+            if hasattr(part, "function_call") and part.function_call:
+                tool_call = part.function_call
+                tool_name = tool_call.name
+                tool_args = dict(tool_call.args)
 
-            # tool dispatch
-            tool_output_content = ""
-            # database tools
-            if tool_name == "execute_sql_query":
-                try:
-                    # force project_id into params for security
-                    if "params" not in tool_args:
-                        tool_args["params"] = {}
-                    tool_args["params"]["project_id"] = project_id
+                logger.info(f"Tool Call: {tool_name} with args: {tool_args}")
 
-                    # convert mapcomposite to dict before passing to tool
-                    tool_args["params"] = dict(tool_args["params"])
+                # tool dispatch
+                tool_output_content = None  # default to none
 
-                    logger.info(f"Executing SQL query from tool call: {tool_args}")
-                    tool_output_content = db_tools.execute_sql_query(repo, **tool_args)
-                except Exception as e:
-                    logger.error(
-                        f"Error executing SQL query: {tool_args}", exc_info=True
-                    )
-                    tool_output_content = json.dumps(
-                        {"error": f"Failed to execute query: {e}"}
-                    )
-            # git tools
-            elif tool_name == "list_branches":
-                tool_output_content = git_tools.list_branches(project_id, repo)
-            elif tool_name == "get_commit_history":
-                # if model doesnt provide a branch, use the default branch.
-                if "branch" not in tool_args or not tool_args["branch"]:
-                    default_branch = git_tools.get_default_branch(project_id, repo)
-                    if default_branch:
-                        tool_args["branch"] = default_branch
-                    else:
-                        tool_output_content = json.dumps(
-                            {"error": "Could not determine the default branch."}
+                # database tools
+                if tool_name == "execute_sql_query":
+                    try:
+                        if "params" not in tool_args:
+                            tool_args["params"] = {}
+                        tool_args["params"]["project_id"] = project_id
+                        tool_args["params"] = dict(tool_args["params"])
+                        logger.info(f"Executing SQL query: {tool_args}")
+                        tool_output_content = db_tools.execute_sql_query(
+                            repo, **tool_args
                         )
+                    except Exception as e:
+                        logger.error(f"Error executing SQL: {e}", exc_info=True)
+                        tool_output_content = json.dumps({"error": str(e)})
 
-                if "branch" in tool_args:
-                    tool_output_content = git_tools.get_commit_history(
-                        project_id, repo, **tool_args
-                    )
-
-            elif tool_name == "get_commit_diff":
-                tool_output_content = git_tools.get_commit_diff(
-                    project_id, repo, **tool_args
-                )
-            elif tool_name == "read_file_at_commit":
-                tool_output_content = git_tools.read_file_at_commit(
-                    project_id, repo, **tool_args
-                )
-            elif tool_name == "analyze_code_with_semgrep":
-                # if model doesnt provide a commit hash, use the latest one from the default branch.
-                if "commit_hash" not in tool_args or not tool_args["commit_hash"]:
-                    default_branch = git_tools.get_default_branch(project_id, repo)
-                    if default_branch:
-                        history = git_tools.get_commit_history(
-                            project_id, repo, branch=default_branch, limit=1
+                # git tools
+                elif tool_name == "list_branches":
+                    tool_output_content = git_tools.list_branches(project_id, repo)
+                elif tool_name == "get_commit_history":
+                    if "branch" not in tool_args or not tool_args["branch"]:
+                        default_branch = git_tools.get_default_branch(
+                            project_id, repo
                         )
-                        if history and not isinstance(history, dict):
-                            latest_commit_hash = history[0].get("hash")
-                            if latest_commit_hash:
-                                tool_args["commit_hash"] = latest_commit_hash
-                            else:
-                                tool_output_content = json.dumps(
-                                    {
-                                        "error": "Could not determine the latest commit hash."
-                                    }
-                                )
+                        if default_branch:
+                            tool_args["branch"] = default_branch
                         else:
                             tool_output_content = json.dumps(
-                                {
-                                    "error": "Could not retrieve commit history to find the latest commit."
-                                }
+                                {"error": "Could not determine default branch."}
                             )
-                    else:
-                        tool_output_content = json.dumps(
-                            {
-                                "error": "Could not determine the default branch for analysis."
-                            }
+                    if "branch" in tool_args:
+                        tool_output_content = git_tools.get_commit_history(
+                            project_id, repo, **tool_args
                         )
-
-                if "commit_hash" in tool_args and not tool_output_content:
+                elif tool_name == "get_commit_diff":
+                    tool_output_content = git_tools.get_commit_diff(
+                        project_id, repo, **tool_args
+                    )
+                elif tool_name == "read_file_at_commit":
+                    tool_output_content = git_tools.read_file_at_commit(
+                        project_id, repo, **tool_args
+                    )
+                elif tool_name == "list_files_at_commit":
+                    tool_output_content = git_tools.list_files_at_commit(
+                        project_id, repo, **tool_args
+                    )
+                elif tool_name == "get_commit_author":
+                    tool_output_content = git_tools.get_commit_author(
+                        project_id, repo, **tool_args
+                    )
+                elif tool_name == "analyze_code_with_semgrep":
                     tool_output_content = git_tools.analyze_code_with_semgrep(
                         project_id, repo, **tool_args
                     )
-            else:
-                tool_output_content = json.dumps(
-                    {"error": f"Unknown tool: {tool_name}"}
-                )
+                else:
+                    tool_output_content = json.dumps(
+                        {"error": f"Unknown tool: {tool_name}"}
+                    )
 
-            # respond to model
-            tool_output = protos.FunctionResponse(
-                name=tool_name,
-                response={"content": tool_output_content},
-            )
+                # if a tool execution happened, append the output
+                if tool_output_content is not None:
+                    tool_outputs.append(
+                        protos.Part(
+                            function_response=protos.FunctionResponse(
+                                name=tool_name,
+                                response={"content": tool_output_content},
+                            )
+                        )
+                    )
 
-            response = chat.send_message(protos.Part(function_response=tool_output))
+        # if there were tool calls, send their responses back to the model
+        if tool_outputs:
+            response = chat.send_message(tool_outputs)
         else:
-            # if the part is not a function call, it should be text.
-            # add a check for robustness.
-            if hasattr(part, "text") and part.text:
-                return part.text
+            # if there were no function calls, it should be a text response
+            final_response_part = response.candidates[0].content.parts[0]
+            if hasattr(final_response_part, "text") and final_response_part.text:
+                return final_response_part.text
             else:
-                # if it's not text and not a function call, we don't know how to handle it.
-                logger.error(f"Unhandled response part type: {type(part)}")
+                logger.error(
+                    f"Unhandled response part type: {type(final_response_part)}"
+                )
                 return "I received a response I don't know how to handle. Please try again."

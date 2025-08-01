@@ -61,7 +61,7 @@ curl -X POST http://localhost:8000/v1/projects \
 -H "Content-Type: application/json" \
 -d '{
   "name": "Invoxa Test Project",
-  "git_repo_url": "https://github.com/dhawal-pandya/invoxa-test.git"
+  "git_repo_url": "https://github.com/dhawal-pandya/Invoxa"
 }'
 ```
 
@@ -226,3 +226,15 @@ curl -X POST "http://localhost:8081/pay_invoice?caller_organization_id=1&caller_
 ## Step 9: View Traces
 
 After running these commands, go to the **Aeonis UI** at `http://localhost:5173`. Enter your project ID and click **Fetch Traces**. You will see new traces corresponding to each `curl` command you executed. Click on them to see the detailed waterfall view and use the AI Chat to ask questions about them.
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+    "message": "Investigate thoroughly the slowest trace of this project?"
+}' http://127.0.0.1:8000/v1/projects/47dfe55d-6c00-40d8-b03d-51123acfdd8a/chat
+```
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{
+    "message": "I am seeing high latency in the `create_organization` endpoint. Can you analyze the code at commit e43127c676f43f191e1f9cccb3a568e21b46681c and tell me what might be causing it?"
+}' http://127.0.0.1:8000/v1/projects/47dfe55d-6c00-40d8-b03d-51123acfdd8a/chat
+```
